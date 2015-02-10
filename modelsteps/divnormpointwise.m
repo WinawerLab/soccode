@@ -17,5 +17,9 @@ function imFlat = divnormpointwise(imFlat, r, s)
     denominator = s^r + pointavg.^r;
 
     imFlat = bsxfun(@rdivide, numerator, denominator);
+    
+    if ~all(isreal(imFlat))
+        keyboard()
+    end
 end
 

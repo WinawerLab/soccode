@@ -1,11 +1,11 @@
-function predictions = socmodel_co(params, imFlat)
+function predictions = socmodel_memgabor(params, imFlat, memgabor)
     assert(max(imFlat(:)) - min(imFlat(:)) - 1 < 10^-16, 'MATLAB:assertion:failed', 'Must be [-0.5, 0.5]')
     
     p = num2cell(params);
     [R, S, X, Y, D, G, N, C] = deal(p{:});
     
     numor = 8; numph = 2;
-    bands = gaborenergy(imFlat, numor, numph);
+    bands = memgabor(imFlat, numor, numph);
     divnorm = divnormpointwise(bands, R, S);
     contrast = sum(divnorm, 3);
     

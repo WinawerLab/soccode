@@ -1,11 +1,7 @@
-function predictions = socmodel_co(params, imFlat)
-    assert(max(imFlat(:)) - min(imFlat(:)) - 1 < 10^-16, 'MATLAB:assertion:failed', 'Must be [-0.5, 0.5]')
-    
+function predictions = socmodel_nogaborstep(params, bands)
     p = num2cell(params);
     [R, S, X, Y, D, G, N, C] = deal(p{:});
     
-    numor = 8; numph = 2;
-    bands = gaborenergy(imFlat, numor, numph);
     divnorm = divnormpointwise(bands, R, S);
     contrast = sum(divnorm, 3);
     

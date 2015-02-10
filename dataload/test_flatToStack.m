@@ -37,36 +37,48 @@ function test_frames_nobands()
 end
 
 function test_bands()
-    % Create three categories, one frame, 5*5 (all primes for dim
+    % Create three categories, two frames, 5*5 (all primes for dim
     % checking), two *bands*
-    im1b1 = (1:25)';
-    im1b2 = (51:75)';
-    im2b1 = (101:125)';
-    im2b2 = (151:175)';
-    im3b1 = (201:225)';
-    im3b2 = (251:275)';
+    im1f1b1 = (1:25)';
+    im1f1b2 = (-1:-1:-25)';
+    im1f2b1 = (51:75)';
+    im1f2b2 = (-51:-1:-75)';
+    
+    im2f1b1 = (101:125)';
+    im2f1b2 = (-101:-1:-125)';
+    im2f2b2 = (151:175)';
+    im2f2b1 = (-151:-1:-175)';
+    
+    im3f1b1 = (201:225)';
+    im3f1b2 = (-201:-1:-225)';
+    im3f2b1 = (251:275)';
+    im3f2b2 = (-251:-1:-275)';
     
     % Flat size is (X*Y) * (C*F) * B
-    flat(:, 1, 1) = im1b1;
-    flat(:, 1, 2) = im1b2;
-    flat(:, 2, 1) = im2b1;
-    flat(:, 2, 2) = im2b2;
-    flat(:, 3, 1) = im3b1;
-    flat(:, 3, 2) = im3b2;
+    flat(:, 1, 1) = im1f1b1;
+    flat(:, 1, 2) = im1f1b2;
+    flat(:, 2, 1) = im1f2b1;
+    flat(:, 2, 2) = im1f2b2;
+    flat(:, 3, 1) = im2f1b1;
+    flat(:, 3, 2) = im2f1b2;
+    flat(:, 4, 1) = im2f2b1;
+    flat(:, 4, 2) = im2f2b2;
+    flat(:, 5, 1) = im3f1b1;
+    flat(:, 5, 2) = im3f1b2;
+    flat(:, 6, 1) = im3f2b1;
+    flat(:, 6, 2) = im3f2b2;
     
-    % Not yet implemented... hopefully will be someday
+    stack = flatToStack(flat, 2);
     
-    assertExceptionThrown(@() flatToStack(flat, 2), 'MATLAB:assertion:failed');
+    % Check size - should be X * Y * C * F * B
+    expectSize = [5, 5, 3, 2, 2];
+    assertEqual(size(stack), expectSize);
     
-%     % Check size - should be X * Y * C * F * B
-%     expectSize = [5, 5, 3, 1, 2];
-%     assertEqual(size(stack), expectSize);
-%     
-%     % Pull out a random entry and check that it's where we expect
-%     get_im2f1 = stack(:, :, 2, 1, 1);
-%     reshape_im2f1 = reshape(im2b1, 5, 5);
-%      
-%     assertEqual(get_im2f1, reshape_im2f1);
+    % Pull out a random entry and check that it's where we expect
+    get_im2f2b2 = stack(:, :, 2, 2, 2);
+    reshape_im2f2b2 = reshape(im2f2b2, 5, 5);
+     
+    assertEqual(get_im2f2b2, reshape_im2f2b2);
 end
 
 function test_unsquare()
