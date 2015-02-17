@@ -1,3 +1,7 @@
+%% Experiment - How long does model fitting work on *one* voxel with a memoized
+% gabor model?
+% ANSWER: very, very long
+
 %% Acquire a dataset
 dataset = 'dataset03.mat';
 load(fullfile(rootpath, ['data/input/fmri_datasets/', dataset]),'betamn','betase');
@@ -32,6 +36,6 @@ socmodel_memoized_handle = get_socmodel_memgabdiv(memgabor, memdiv);
 
 %% Do modelfitting
 modelfittingRawIm(socmodel_memoized_handle, betamnToUse, imToUse);
-
+% This takes VERY VERY long
 
 

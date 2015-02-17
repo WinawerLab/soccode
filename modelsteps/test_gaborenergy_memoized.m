@@ -32,6 +32,6 @@ function test_speed()
     newOutput = memgabor(secondFlat, 8, 2);
     newTime = toc;
     
-    assertTrue(origTime > 100*repeatTime) % Expect over a 100-fold speedup for repeat images
-    assertTrue(origTime < 2*newTime) % but no speedup, certainly not even twice as fast, for new images
+    assertTrue(origTime > 100*repeatTime, 'If this fails, try rerunning tests.') % Expect over a 100-fold speedup for repeat images
+    assertTrue(origTime < 3*newTime, 'If this fails, try rerunning tests.') % but no speedup, certainly not even twice as fast, for new images
 end
