@@ -1,6 +1,10 @@
 function wgetData(overwrite)
 % WGET DATA - This function fetches the stimuli and fMRI responses, which
 % are not included in this git repository, and downloads them.
+%
+% This command can be run on HPC with
+% matlab -nodisplay -r "addpath(genpath('/scratch/cao324/SOC/code')); wgetData; exit()"
+%
 %   overwrite - if true, then will re-download and overwrite existing data,
 %   if any exists
 
@@ -26,10 +30,10 @@ function wgetData(overwrite)
 
     % Set up output directories while we're at it
     if ~exist(fullfile(rootpath, 'modelfits'), 'dir')
-        mkdir(fullfile(rootpath, 'modelfits'), 'dir')
+        mkdir(fullfile(rootpath, 'modelfits'))
     end
     if ~exist(fullfile(rootpath, 'preprocessing'), 'dir')
-        mkdir(fullfile(rootpath, 'preprocessing'), 'dir')
+        mkdir(fullfile(rootpath, 'preprocessing'))
     end
 
     %% Download; overwrite only if "overwrite" flag is on
