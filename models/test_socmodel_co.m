@@ -1,4 +1,4 @@
-function test_socmodel()
+function test_socmodel_co()
     test_rejectbadrange();
     test_rejectbadsize();
     test_comparetosaved();

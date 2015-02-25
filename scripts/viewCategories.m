@@ -1,7 +1,8 @@
-%% Acquire a dataset
-dataset = 'dataset03.mat';
-load(fullfile(rootpath, ['data/input/fmri_datasets/', dataset]),'betamn','betase');
-imNumsDataset = 70:225;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Simulation: View predictions on gratings vs patterns, as a bar plot
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %% Choose categories
 gratingNums = 176:180; gratingIdx = 1:5;
