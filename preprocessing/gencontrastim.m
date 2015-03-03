@@ -13,7 +13,9 @@ if ~exist(outputdir, 'dir')
     mkdir(outputdir);
 end
 
-gaborBands = gaborenergy(imFlat, 8, 2);
+numor = 8;
+numph = 2;
+gaborBands = gaborenergy(imFlat, numor, numph);
 save(fullfile(outputdir, 'gaborBands.mat'), 'gaborBands');
 
 %% Continue with contrast images
@@ -26,7 +28,9 @@ toc;
 for t = [0 0.001 0.1 1.0 10.0 100.0 1000.0] % zero is just a check
     tic;
     disp(['Starting neighbor divnorm ', num2str(t)]);
-    divnorm_output = divnormneighbors(gaborBands, 1, 0.5, t);
+    r = 1;
+    s = 0.5;
+    divnorm_output = divnormneighbors(gaborBands, r, s, t);
     contrastNeighbors = sum(divnorm_output, 3);
     name = ['contrastNeighbors', strrep(num2str(t), '.', 'pt'), '.mat'];
     save(fullfile(outputdir, name), 'contrastNeighbors');

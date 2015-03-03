@@ -7,7 +7,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Acquire dataset
-dataset = 'dataset03.mat';
+datasetNum = 3;
+dataset = ['dataset', num2str(datasetNum, '%02d'), '.mat'];
 load(fullfile(rootpath, ['data/input/fmri_datasets/', dataset]),'betamn','betase');
 % betamn is 1323 voxels * 156 betamn values
 
@@ -29,15 +30,15 @@ betamnToUse = betamn(voxNum, betamnIdx);
 modelfun = get_socmodel_original(90);
 
 %% Fitting
-inputdir = fullfile(rootpath, 'data/preprocessing/2014-12-04');
+inputdir = 'data/preprocessing/2014-12-04';
 
-outputdir = fullfile(rootpath, ['data/modelfits/', datestr(now,'yyyy-mm-dd')]);
-if ~exist(outputdir, 'dir')
-    mkdir(outputdir);
+outputdir = ['data/modelfits/', datestr(now,'yyyy-mm-dd'));
+if ~exist(fullfile(rootpath, outputdir), 'dir')
+    mkdir(fullfile(rootpath, outputdir));
 end
 
 T = [0 0.001 0.1 1.0 10.0 100.0 1000.0];
-results = cell(1, length(t));
+results = cell(1, length(T));
 
 for i = 1:length(T);
     if i == 1
@@ -46,18 +47,25 @@ for i = 1:length(T);
     t = T(i);
     
     % Load and resize preprocessed contrast images
-    name = ['contrastNeighbors', strrep(num2str(t), '.', 'pt'), '.mat'];
-    load(fullfile(inputdir, name));
+    imFilename = ['contrastNeighbors', strrep(num2str(t), '.', 'pt'), '.mat'];
+    load(fullfile(rootpath, inputdir, imFilename));
     imStack = flatToStack(contrastNeighbors, 9);
     imPxv = stackToPxv(imStack);
     imToUse = permute(imPxv, [2 1 3]);
     
     % Fit the modelfun!
     results{i} = modelfittingContrastIm(modelfun, betamnToUse, imToUse);
-    results{i}.tvalue = t;
-    results{i}.voxel = voxNum;
+    results{i}.voxNums = voxNum;
+    results{i}.dataset = datasetNum;
+    results{i}.voxNums = voxNum;
+    results{i}.imNums = imNumsToUse;
+    results{i}.modelfun = 'get_socmodel_original(90)';
+    results{i}.inputImages = fullfile(inputdir, imFilename);
+    results{i}.r = 1;
+    results{i}.s = 0.5;
+    results{i}.t = t;
     
-    save(fullfile(outputdir, 'neighbordivnorm-results.mat'), 'results')
+    save(fullfile(rootpath, outputdir, ['neighbordivnorm-results-subj', num2str(datasetNum), '-vox', num2str(voxNum), '.mat']), 'results')
 end
 
 %% Load existing fits
@@ -70,9 +78,9 @@ T = [0 0.001 0.1 1.0 10.0 100.0 1000.0];
 t = T(i);
 
 %% Load and resize preprocessed contrast images for this t, again
-name = ['contrastNeighbors', strrep(num2str(t), '.', 'pt'), '.mat'];
+imFilename = ['contrastNeighbors', strrep(num2str(t), '.', 'pt'), '.mat'];
 inputdir = fullfile(rootpath, 'data/preprocessing/2014-12-04');
-load(fullfile(inputdir, name));
+load(fullfile(inputdir, imFilename));
 imStack = flatToStack(contrastNeighbors, 9);
 imPxv = stackToPxv(imStack);
 imToUse = permute(imPxv, [2 1 3]);

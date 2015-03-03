@@ -8,7 +8,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Dataset
-dataset = 'dataset03.mat';
+datasetNum = 3;
+dataset = ['dataset', num2str(datasetNum, '%02d'), '.mat'];
 load(fullfile(rootpath, ['data/input/fmri_datasets/', dataset]),'betamn','betase', 'roi', 'roilabels');
 imNumsDataset = 70:225;
 imNumsToUse = [70:173, 175:225]; % skip the category with only 7 frames
@@ -27,31 +28,32 @@ betamnToUse = betamn(voxNums, betaIdx);
 modelfun = get_socmodel_original(90);
 
 %% Fitting 
-inputdir = fullfile(rootpath, 'data/preprocessing/2014-12-04');
-outputdir = fullfile(rootpath, ['data/modelfits/', datestr(now,'yyyy-mm-dd')]);
+inputdir = 'data/preprocessing/2014-12-04';
+outputdir = ['data/modelfits/', datestr(now,'yyyy-mm-dd')];
 
 t = 100;
 
 % Load and resize preprocessed contrast images
-name = ['contrastNeighbors', strrep(num2str(t), '.', 'pt'), '.mat'];
-load(fullfile(inputdir, name));
+imFilename = ['contrastNeighbors', strrep(num2str(t), '.', 'pt'), '.mat'];
+load(fullfile(rootpath, inputdir, imFilename));
 imStack = flatToStack(contrastNeighbors, 9);
 imPxv = stackToPxv(imStack);
 imToUse = permute(imPxv, [2 1 3]);
     % Permute because old fitting code expects C * (X*Y) * F, not (X*Y) * C * F
 
 % Fit the modelfun!
-results{i} = modelfittingContrastIm(modelfun, betamnToUse, imToUse);
-results{i}.tvalue = t;
+results = modelfittingContrastIm(modelfun, betamnToUse, imToUse);
+results.tvalue = t;
 
-if ~exist(outputdir, 'dir')
-    mkdir(outputdir);
+if ~exist(fullfile(rootpath, outputdir), 'dir')
+    mkdir(fullfile(rootpath, outputdir));
 end
 
-save(fullfile(outputdir, ['neighbordivnorm-', strrep(num2str(t), '.', 'pt'), '-results-twentyvoxels.mat']), 'results')
+save(fullfile(rootpath, outputdir, ['neighbordivnorm-results-subj', num2str(datasetNum), '-t', strrep(num2str(t), '.', 'pt'), '-twentyvoxels.mat']), 'results')
 
 %% Load the new fits
-load(fullfile(rootpath, 'data/modelfits/2014-12-04', ['neighbordivnorm-', strrep(num2str(t), '.', 'pt'), '-results-twentyvoxels-save.mat']), 'results');
+t = 100;
+load(fullfile(rootpath, 'data/modelfits/2014-12-04', ['neighbordivnorm-results-subj', num2str(datasetNum), '-t', strrep(num2str(t), '.', 'pt'), '-twentyvoxels.mat']), 'results');
     
 %% Load the very old previous fits, from the old directory
 
@@ -87,6 +89,7 @@ figure; hold on; bar(newPerformance, 'r'); bar(oldPerformance, 'b');
 legend('new model, orientation-tuned surround', 'old model, pointwise DN')
 
 %% How does c change?
+% TODO this doesn't work now, bleh
 cparams = [squeeze(oldParams(:,6,:)), squeeze(newParams(:,6,:))];
 figure; hold all;
 for i = 1:size(cparams, 1)
