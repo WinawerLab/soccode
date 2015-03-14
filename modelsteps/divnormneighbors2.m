@@ -1,4 +1,4 @@
-function resultFlat = divnormneighbors(imFlat, r, s, t, x)
+function resultFlat = divnormneighbors2(imFlat, r, s, a, e)
 %DIVNORM NEIGHBORS: Apply divisive normalization across all bands
 %of a set of flattened images, both pointwise *and* within-band surround on
 %immediate neighbors
@@ -7,8 +7,8 @@ function resultFlat = divnormneighbors(imFlat, r, s, t, x)
 %   imFlat - a matrix (X*Y pixels) * N images * B bands of flattened
 %       images decomposed into orientation energy bands
 %   r, s - normalization parameters in x^r / (s^r + avg^r)
-%   t - how much the surround weighs into the tuned surround
-%   x - spatial extent, measured in pixels away from center
+%   a - how much the surround weighs into the computation
+%   e - spatial extent, measured in pixels away from center
 %
 % Outputs:
 %   imFlat - a matrix (X*Y)*N*B of image data after divisive normalization,
@@ -17,9 +17,11 @@ function resultFlat = divnormneighbors(imFlat, r, s, t, x)
 %       nearby neighbors
 
     if nargin < 5
-        x = 2; % backwards compatibility
+        e = 2; % backwards compatibility
     end
     
+    assert((0 <= a) && (a <= 1), 'parameter "a" should be between 0 and 1');
+
     % For a convolutional operation, go straight into stack space
     imStack = flatToStack(imFlat, 1); % no frames, just pull out X * Y * N * 1 * B
     
@@ -28,16 +30,17 @@ function resultFlat = divnormneighbors(imFlat, r, s, t, x)
     
     % Compute the untuned, central contribution; same for all orientations
     pointsum = sum(imStack, 5);
+    pointavg = pointsum / size(imStack, 5);
         
     % Compute the tuned, surround contribution; different per orientation
-    convKern = t * ones(2*x + 1);
-    convKern(x+1, x+1) = 0;
-    padded = padarray(imStack, [2, 2], 'circular');
-    surround = convn(padded, convKern, 'valid');
+    convKern = ones(2*e + 1);
+    convKern(e+1, e+1) = 0;
+    padded = padarray(imStack, [e, e], 'circular');
+    surroundsum = convn(padded, convKern, 'valid');
+    surroundavg = surroundsum / sum(convKern(:));
     
     % Put together the contribution as an "average"
-    contributions = bsxfun(@plus, pointsum, surround);
-    avg = contributions ./ (size(imStack, 5) + sum(convKern(:)));
+    avg = bsxfun(@plus, (1-a) * pointavg, a * surroundavg);
     denominator = s^r + avg.^r;
 
     resultStack = bsxfun(@rdivide, numerator, denominator);

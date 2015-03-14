@@ -3,7 +3,7 @@
 % 
 % - Generate new fits for *twenty* good voxels on new contrast images at
 %   *two* parameterizations; this is for dataset 4 which has no loadable
-%   params
+%   params so must be freshly generated
 %
 %   Experiment run 2015-03-02
 %
