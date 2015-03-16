@@ -34,6 +34,7 @@ for r = rvals
                 preprocess.function = 'divnormneighbors2(gaborBands, r, s, a, e)';
                 preprocess.inputImages = inputfile;
                 preprocess.imNums = imNumsToUse;
+                preprocess.nFrames = 9; % number of frames per category in this dataset
                 
                 name = ['divnormbands_r', strrep(num2str(r), '.', 'pt'),...
                                     '_s', strrep(num2str(s), '.', 'pt'),...
@@ -47,7 +48,7 @@ for r = rvals
     end
 end
 
-%% Visualize them
+%% Visualize them - TODO this doesn't work yet
 ixs = arrayfun(@(x) find(imNumsToUse == x,1,'first'), [176:180, 181:184]);
 show = [];
 for t = [NaN 0 0.001 0.1 1.0 10.0 100.0 1000.0]

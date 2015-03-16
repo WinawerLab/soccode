@@ -21,7 +21,7 @@ function imStack = flatToStack(imFlat, nFrames)
     assert(ndims(imFlat) < 4, 'MATLAB:assertion:failed', 'flatToStack can be at most (X*Y) * ims * bands');
     
     [XY, CF, B] = size(imFlat);
-    assert(isint(sqrt(XY)), 'MATLAB:assertion:failed', 'flatToStack is currently only implemented for square images');
+    assert(mod(sqrt(XY),1) == 0, 'MATLAB:assertion:failed', 'flatToStack is currently only implemented for square images');
     
     X = sqrt(XY);
     Y = sqrt(XY);
