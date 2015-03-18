@@ -15,7 +15,7 @@ end
 rvals = [0.25, 0.5, 1, 1.5, 2, 4];
 svals = [0.125, 0.25, 0.5, 0.75, 1, 2];
 avals = [0, 0.25, 0.5, 0.75, 1];
-evals = [1, 2, 3, 4];
+evals = [8, 12, 16];
 
 for r = rvals
     for s = svals
@@ -47,21 +47,3 @@ for r = rvals
         end
     end
 end
-
-%% Visualize them - TODO this doesn't work yet
-ixs = arrayfun(@(x) find(imNumsToUse == x,1,'first'), [176:180, 181:184]);
-show = [];
-for t = [NaN 0 0.001 0.1 1.0 10.0 100.0 1000.0]
-    if isnan(t)
-        name = 'contrastPointwise.mat';
-        load(fullfile(outputdir, name));
-        contrastStack = flatToStack(contrastPointwise, 9);
-    else
-        name = ['contrastNeighbors', strrep(num2str(t), '.', 'pt'), '.mat'];
-        load(fullfile(outputdir, name));
-        contrastStack = flatToStack(contrastNeighbors, 9);
-    end
-    row = reshape(contrastStack(:,:,ixs,1), 90, 90*9);
-    show = [show; row];
-end
-figure; imshow(show, []);
