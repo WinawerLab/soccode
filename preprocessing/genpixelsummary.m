@@ -1,13 +1,35 @@
-%% Load images; compile statistics about them
-catMeans.rvals = [0.25, 0.5, 1, 1.5, 2]; % 4 is currently missing on home laptop
-catMeans.svals = [0.125, 0.25, 0.5, 0.75, 1, 2];
-catMeans.avals = [0, 0.25, 0.5, 0.75, 1];
-catMeans.evals = [1, 2, 3, 4];
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Preprocessing: Extract pixel means and pixel variances within the
+% stimulus aperture of a generated set of images, and save for future
+% reference.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-catVars.rvals = [0.25, 0.5, 1, 1.5, 2]; % 4 is currently missing on home laptop
-catVars.svals = [0.125, 0.25, 0.5, 0.75, 1, 2];
-catVars.avals = [0, 0.25, 0.5, 0.75, 1];
-catVars.evals = [1, 2, 3, 4];
+%% Load preprocessed images; compile statistics about them
+rvals = [0.25, 0.5, 1, 1.5, 2, 4];
+svals = [0.125, 0.25, 0.5, 0.75, 1, 2];
+avals = [0, 0.25, 0.5, 0.75, 1];
+evals = [1, 2, 3, 4, 8, 12, 16];
+
+catMeans.rvals = rvals;
+catMeans.svals = svals;
+catMeans.avals = avals;
+catMeans.evals = evals;
+
+catVars.rvals = rvals;
+catVars.svals = svals;
+catVars.avals = avals;
+catVars.evals = evals;
+
+bandMeans.rvals = rvals;
+bandMeans.svals = svals;
+bandMeans.avals = avals;
+bandMeans.evals = evals;
+
+bandVars.rvals = rvals;
+bandVars.svals = svals;
+bandVars.avals = avals;
+bandVars.evals = evals;
 
 filedir = fullfile(rootpath, 'data/preprocessing/2015-03-11');
 
@@ -19,13 +41,20 @@ filedir = fullfile(rootpath, 'data/preprocessing/2015-03-11');
 % First create a mask, to prepare to grab the mean and variance in relevant region
 mask = makeCircleMask(37.5, 90);
 
-% We'll save our measurements in two big matrices, indexed by r, s, a, and
+% We'll save our measurements in big matrices, indexed by r, s, a, and
 % e, and then the image number for that category
+nImages = 155;
+nBands = 8;
 catMeans.values = zeros(length(catMeans.rvals), length(catMeans.svals), ...
-                           length(catMeans.avals), length(catMeans.evals), 155);
+                        length(catMeans.avals), length(catMeans.evals), nImages);
 catVars.values = zeros(length(catVars.rvals), length(catVars.svals), ...
-                          length(catVars.avals), length(catVars.evals), 155);
-% ^^^^ Pardon the magic number 155 for number of categories...
+                       length(catVars.avals), length(catVars.evals), nImages);
+                      
+bandMeans.values = zeros(length(bandMeans.rvals), length(bandMeans.svals), ...
+                         length(bandMeans.avals), length(bandMeans.evals), nImages, nBands);
+bandVars.values = zeros(length(bandVars.rvals), length(bandVars.svals), ...
+                         length(bandVars.avals), length(bandVars.evals), nImages, nBands);
+
 
 % Now go imageset-by-imageset and get two measurements per image category
 
@@ -41,8 +70,9 @@ for rIdx = 1:length(catMeans.rvals)
                 if(exist(fullfile(filedir, name), 'file'))
                     load(fullfile(filedir, name), 'preprocess');
                     imNumsToUse = preprocess.imNums;
-
                     nFrames = size(preprocess.bands, 2) / length(preprocess.imNums);
+                    
+                    % Process the contrast images
                     contrastIms = flatToStack(preprocess.contrast, nFrames);
                     relevantPixels = maskNd(contrastIms, mask);
 
@@ -51,9 +81,22 @@ for rIdx = 1:length(catMeans.rvals)
 
                     frameVars = var(relevantPixels, 1);
                     catVars.values(rIdx, sIdx, aIdx, eIdx, :) = squeeze(mean(frameVars, 3)');
+                    
+                    % Process the bands
+                    bandIms = flatToStack(preprocess.bands, nFrames);
+                    relevantPixels = maskNd(bandIms, mask);
+
+                    frameMeans = mean(relevantPixels, 1);
+                    bandMeans.values(rIdx, sIdx, aIdx, eIdx, :, :) = squeeze(mean(frameMeans, 3));
+
+                    frameVars = var(relevantPixels, 1);
+                    bandMeans.values(rIdx, sIdx, aIdx, eIdx, :, :) = squeeze(mean(frameVars, 3));
+                  
                 else
                     catMeans.values(rIdx, sIdx, aIdx, eIdx, :) = NaN;
                     catVars.values(rIdx, sIdx, aIdx, eIdx, :) = NaN;
+                    bandMeans.values(rIdx, sIdx, aIdx, eIdx, :, :) = NaN;
+                    bandVars.values(rIdx, sIdx, aIdx, eIdx, :, :) = NaN;
                 end
             end
         end
