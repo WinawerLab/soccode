@@ -1,4 +1,4 @@
-function output = gaborenergy(imFlat, numor, numph)
+function output = gaborenergy(imFlat, numor, numph, cpfovs)
 %GABOR ENERGY: Compute the gabor energy, summed across phases, at each of
 %numor orientation bands, using gabor wavelets
 %
@@ -10,9 +10,13 @@ function output = gaborenergy(imFlat, numor, numph)
 %   imFlat - a matrix of (X*Y) * N * numor bands of energy, summed across
 %   phases, with gabor wavelets
 
+    if ~exist('cpfovs', 'var'), 
+         cpfovs = 37.5*(180/150); % WARNING is not sufficiently general!
+    end
+    
     assert(ndims(imFlat) < 3, 'MATLAB:assertion:failed', 'imFlat may not already contain bands');
 
-    cpfovs = 37.5*(180/150); % WARNING is not sufficiently general!
+   
     if sqrt(size(imFlat, 1)) ~= 180
         warning('gaborenergy only appropriate params for 180x180 images');
     end
