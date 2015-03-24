@@ -68,6 +68,7 @@ for rIdx = 1:length(catMeans.rvals)
                                     '_e', strrep(num2str(catMeans.evals(eIdx)), '.', 'pt'), '.mat'];
                 
                 if(exist(fullfile(filedir, name), 'file'))
+                    %tic;
                     load(fullfile(filedir, name), 'preprocess');
                     imNumsToUse = preprocess.imNums;
                     nFrames = size(preprocess.bands, 2) / length(preprocess.imNums);
@@ -91,7 +92,8 @@ for rIdx = 1:length(catMeans.rvals)
 
                     frameVars = var(relevantPixels, 1);
                     bandMeans.values(rIdx, sIdx, aIdx, eIdx, :, :) = squeeze(mean(frameVars, 3));
-                  
+                    %toc;
+                    %Takes about 5 seconds per file to load and process
                 else
                     catMeans.values(rIdx, sIdx, aIdx, eIdx, :) = NaN;
                     catVars.values(rIdx, sIdx, aIdx, eIdx, :) = NaN;
@@ -111,4 +113,6 @@ end
 
 save(fullfile(outputdir, 'divnormcatmeans.mat'), 'catMeans');
 save(fullfile(outputdir, 'divnormcatvars.mat'), 'catVars');
+save(fullfile(outputdir, 'divnormbandmeans.mat'), 'catMeans');
+save(fullfile(outputdir, 'divnormbandvars.mat'), 'catVars');
 
