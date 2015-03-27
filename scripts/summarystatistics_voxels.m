@@ -29,7 +29,7 @@ load(fullfile(rootpath, 'code/visualization/stimuliNames.mat'), 'stimuliNames')
 names = stimuliNames(imNumsToUse);
 
 %% OK, honestly I do want the divnorms here, too!
-divnormdir = fullfile(rootpath, 'data/preprocessing/2015-03-20');
+divnormdir = fullfile(rootpath, 'data/preprocessing/2015-03-27');
 load(fullfile(divnormdir, 'divnormcatmeans.mat'), 'catMeans');
 load(fullfile(divnormdir, 'divnormcatvars.mat'), 'catVars');
 
@@ -138,27 +138,52 @@ title('Grating peak vs. pattern peak, V1 and hV4');
 legend('V1', 'hV4', 'contrast im means', 'contrast im variances');
 
 
-%% Focus on tooltips here!
-f=figure; hold on;
-plot([voxsummary{1}.gratingAvg], [voxsummary{1}.patternAvg], 'go');
-plot([voxsummary{4}.gratingAvg], [voxsummary{4}.patternAvg], 'mo');
-plot(catMeans.gratingAvg(:), catMeans.patternAvg(:), 'bo');
-plot(catVars.gratingAvg(:), catVars.patternAvg(:), 'co');
-% tmp1 = catMeans.gratingAvg(3, 3, :, :);
-% tmp2 = catMeans.patternAvg(3, 3, :, :);
-% plot(tmp1(:), tmp2(:), 'bo');
-% tmp1 = catVars.gratingAvg(3, 3, :, :);
-% tmp2 = catVars.patternAvg(3, 3, :, :);
-% plot(tmp1(:), tmp2(:), 'co');
+%% Focus on tooltips and colors here!
+f=figure; hold all;
+
+colorset = jet();
+colorAssignments = cell(size(catMeans.gratingAvg));
+
+for ii = 1:length(catMeans.rvals)
+    colorIdx = floor((size(colorset,1)-1) * (ii/length(catMeans.rvals))) + 1;
+    colorAssignments(ii, :, :, :, :) = {colorset(colorIdx, :)};
+end
+% for ii = 1:length(catMeans.svals)
+%     colorIdx = floor((size(colorset,1)-1) * (ii/length(catMeans.svals))) + 1;
+%     colorAssignments(:, ii, :, :, :) = {colorset(colorIdx, :)};
+% end
+% for ii = 1:length(catMeans.avals)
+%     colorIdx = floor((size(colorset,1)-1) * (ii/length(catMeans.avals))) + 1;
+%     colorAssignments(:, :, ii, :, :) = {colorset(colorIdx, :)};
+% end
+% for ii = 1:length(catMeans.evals)
+%     colorIdx = floor((size(colorset,1)-1) * (ii/length(catMeans.evals))) + 1;
+%     colorAssignments(:, :, :, ii, :) = {colorset(colorIdx, :)};
+% end
+
+% Show all:
+scatter(catMeans.gratingAvg(:), catMeans.patternAvg(:), [], cell2mat(colorAssignments(:)));
+
+% Show just a subset:
+% gr = catMeans.gratingAvg(:, :, catMeans.avals==0, catMeans.evals==1);
+% pat = catMeans.patternAvg(:, :, catMeans.avals==0, catMeans.evals==1);
+% colors = colorAssignments(:, :, catMeans.avals==0, catMeans.evals==1);
+% scatter(gr(:), pat(:), [], colors(:))
 
 ezplot('x', 'r');
 axis([0, 5, 0, 5]); axis('square');
 xlabel('Grating average'); ylabel('Pattern average')
 title('Grating vs. pattern, average comparison');
-legend('V1', 'hV4', 'contrast im means', 'contrast im variances');
+legend('contrast im means');
 
 dcm_obj = datacursormode(f);
-set(dcm_obj,'UpdateFcn',indsubTooltip('gr', 'pt', size(catMeans.gratingAvg)));
+myplotter = @(sub, fhandle)(plotTwoBarSets(squeeze(catMeans.values(sub{:}, gratingSparse)),...
+                                  squeeze(catMeans.values(sub{:}, patternSparse)),...
+                                  'grating', 'pattern', fhandle));
+indexInto = {catMeans.rvals, catMeans.svals, catMeans.avals, catMeans.evals};
+
+barFig = figure;
+set(dcm_obj,'UpdateFcn',subfigureTooltip('gr', 'pat', size(catMeans.gratingAvg), indexInto, myplotter, barFig));
 
 %% Quantifying sparsity: which bin has the peak sparsity?
 gratingSparse = find(strcmp(names, 'grating_sparse'));

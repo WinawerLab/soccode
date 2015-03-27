@@ -31,7 +31,12 @@ bandVars.svals = svals;
 bandVars.avals = avals;
 bandVars.evals = evals;
 
-filedir = fullfile(rootpath, 'data/preprocessing/2015-03-11');
+fileDir = fullfile('data', 'preprocessing', '2015-03-11');
+
+catMeans.fileDir = fileDir;
+carVars.fileDir = fileDir;
+bandMeans.fileDir = fileDir;
+bandVars.fileDir = fileDir;
 
 %% Step one is to compile something that's as much like a single voxel's
 % beta weight as possible - which is really averaging over frames
@@ -73,9 +78,9 @@ for rIdx = 1:length(catMeans.rvals)
                                     '_a', strrep(num2str(catMeans.avals(aIdx)), '.', 'pt'),...
                                     '_e', strrep(num2str(catMeans.evals(eIdx)), '.', 'pt'), '.mat'];
                 
-                if(exist(fullfile(filedir, name), 'file'))
+                if(exist(fullfile(rootpath, fileDir, name), 'file'))
                     %tic;
-                    load(fullfile(filedir, name), 'preprocess');
+                    load(fullfile(rootpath, fileDir, name), 'preprocess');
                     imNumsToUse = preprocess.imNums;
                     nFrames = size(preprocess.bands, 2) / length(preprocess.imNums);
                     
@@ -112,7 +117,7 @@ for rIdx = 1:length(catMeans.rvals)
 end
 
 %% That took a little while to generate, so let's save it
-outputdir = fullfile(rootpath, ['data/preprocessing/', datestr(now,'yyyy-mm-dd')]);
+outputdir = fullfile(rootpath, 'data', 'preprocessing', datestr(now,'yyyy-mm-dd'));
 if ~exist(outputdir, 'dir')
     mkdir(outputdir);
 end
