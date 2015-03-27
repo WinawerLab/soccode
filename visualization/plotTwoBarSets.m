@@ -1,4 +1,8 @@
 function plotTwoBarSets(cat1Values, cat2Values, cat1Name, cat2Name)
+% PLOT TWO BAR SETS - Plot category 1 bars in red, and category 2 in blue
+%
+% Inputs:
+%   cat1Values - 
 
     figure; setfigurepos([10 100 600 200]);
     

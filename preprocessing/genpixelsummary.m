@@ -39,7 +39,13 @@ filedir = fullfile(rootpath, 'data/preprocessing/2015-03-11');
 % pixels in the circular aperture containing the image
 
 % First create a mask, to prepare to grab the mean and variance in relevant region
-mask = makeCircleMask(37.5, 90);
+maskSize = 34;
+mask = makeCircleMask(maskSize, 90); % Smaller mask, misses the edges; only correct for the 90x90 images
+
+catMeans.maskSize = maskSize;
+catVars.maskSize = maskSize;
+bandMeans.maskSize = maskSize;
+bandVars.maskSize = maskSize;
 
 % We'll save our measurements in big matrices, indexed by r, s, a, and
 % e, and then the image number for that category
