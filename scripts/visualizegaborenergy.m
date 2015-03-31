@@ -58,7 +58,7 @@ end
 % gaborStackMeanOverOri = mean(overallSum, 5);
 
 %% Option 1: Use just a single resized small stack:
-coeff = 1;
+coeff = .5;
 gaborStackMeanOverOri = mean(gaborStackResize{coeffs == coeff}, 5);
 
 %% Acquire the indexes for sparse gratings and patterns
@@ -90,7 +90,7 @@ for ii = repmat([gratingSparse, patternSparse], 1, 4)
     
     subplot(3,1,2); cla
     plot(sort(gaborStackMeanOriPix(:))); hold on;
-    plot([1 numel(gaborStackMeanOriPix)], [1 1]*gaborStackMeanOriPix(ii), 'r-') % ignores frame dimension
+    plot([1 numel(gaborStackMeanOriPix)], [1 1]*mean(gaborStackMeanOriPix(ii,:),2), 'r-') % ignores frame dimension
     title('Means')
     
     subplot(3,1,3); cla

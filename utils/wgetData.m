@@ -29,11 +29,11 @@ function wgetData(overwrite)
     end
 
     % Set up output directories while we're at it
-    if ~exist(fullfile(rootpath, 'modelfits'), 'dir')
-        mkdir(fullfile(rootpath, 'modelfits'))
+    if ~exist(fullfile(datadir, 'modelfits'), 'dir')
+        mkdir(fullfile(datadir, 'modelfits'))
     end
-    if ~exist(fullfile(rootpath, 'preprocessing'), 'dir')
-        mkdir(fullfile(rootpath, 'preprocessing'))
+    if ~exist(fullfile(datadir, 'preprocessing'), 'dir')
+        mkdir(fullfile(datadir, 'preprocessing'))
     end
 
     %% Download; overwrite only if "overwrite" flag is on
