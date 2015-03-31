@@ -37,7 +37,7 @@ for c = 1:length(coeffs)
 end
 
 %% Option 0: take mean over ori of one of the gaborstacks
-coeff = 1;
+coeff = 0.5;
 gaborStackMeanOverOri = mean(gaborStack{coeffs == coeff}, 5);
 
 %% Option 2: combine gabor stacks
@@ -72,7 +72,7 @@ figure; colormap gray;
 gaborlim = [min(gaborStackMeanOverOri(:)) max(gaborStackMeanOverOri(:))];
 
 % First create a mask, to prepare to grab the mean and variance in relevant region
-mask = makeCircleMask(37.5, 90); % Only correct for the 90x90 images
+mask = makeCircleMask(34, 90); % Smaller mask, misses the edges; only correct for the 90x90 images
 gaborStackMeanOriPix = squeeze(mean(maskNd(gaborStackMeanOverOri, mask), 1));
 gaborStackMeanOriVar = squeeze(var(maskNd(gaborStackMeanOverOri, mask), 1));
 
