@@ -37,4 +37,9 @@ function output = createPatternStimulus(sz, relCutoff, bpfilter)
     % the Fourier domain
     edgePad = padarray(edge, floor(size(bpfilter)/2), 'circular', 'both');
     output = conv2(edgePad, bpfilter, 'valid');
+
+    % Visualize the images (or comment this out to not do so)
+    tinybp = placematrix(zeros(size(edge)), bpfilter, mid - size(bpfilter)/2);
+    toShow = {im, ifft2(ifftshift(mask)), res, double(thresh), edge, bpfilter, tinybp, output};
+    showFourier(toShow);
 end
