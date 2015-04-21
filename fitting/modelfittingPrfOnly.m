@@ -1,17 +1,17 @@
-function results = modelfittingContrastIm(modelhandle, betamnToUse, imToUse)
-% Virtually unchanged from soc_modelfitting.m
+function results = modelfittingPrfOnly(modelhandle, betamnToUse, imToUse)
+% Model fitting for the pRF only
+
     res = 90;
-    
-    X = (1+res)/2;
-    Y = (1+res)/2;
-    D = res/4*sqrt(0.5);
-    G = 10; % why is this set so high??
-    Ns = [.05 .1 .3 .5]; % uncomment me to re-enable 16-fold resampling
-    Cs = [.4 .7 .9 .95];
+    Xs = (1+res)* [0.2 0.4 0.6 0.8];
+    Ys = (1+res) * [0.2 0.4 0.6 0.8];
+    D = res/4*sqrt(0.5); % not currently reseeding, let's see how it goes
+    G = 10; %10; 
+    N = 0.3; % 0.5; % Currently working with no N reseeding
+    C = 0.7; % 0.9; % And also no C reseeding, temporarily for now
     seeds = [];
-    for frame=1:length(Ns)
-      for q=1:length(Cs)
-        seeds = cat(1,seeds,[X Y D G Ns(frame) Cs(q)]);
+    for x=1:length(Xs)
+      for y=1:length(Ys)
+        seeds = cat(1,seeds,[Xs(x) Ys(y) D G N C]);
       end
     end
 
@@ -20,11 +20,7 @@ function results = modelfittingContrastIm(modelhandle, betamnToUse, imToUse)
     boundsFIX = bounds;
     boundsFIX(1,5:6) = NaN; % fix the N and C
 
-    model = {{[]         boundsFIX   modelhandle} ...
-             {@(ss) ss   bounds      @(ss) modelhandle}};
-         % First row is seeds, bounds (NaN is "fixed"), modelfun
-         % Second row reuses params without transformation.  The @(ss) ss
-         % are no-ops.
+    model = {{[]         boundsFIX   modelhandle}};
          
     optimoptions = {'Algorithm' 'levenberg-marquardt' 'Display' 'off'};
     resampling = 0;

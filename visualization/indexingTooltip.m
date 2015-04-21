@@ -5,6 +5,10 @@ function updateFcn = indexingTooltip(xname, yname)
     function txt = myUpdateFcn(~, event_obj)
         pos = get(event_obj, 'Position');
         idx = get(event_obj, 'DataIndex');
+        
+%         if exist(indexInto, 'var')
+%             idx = indexInto(idx);
+%         end
         txt = {[xname, ': ', num2str(pos(1))], ...
                [yname, ': ', num2str(pos(2))], ...
                ['idx: ', num2str(idx)]};

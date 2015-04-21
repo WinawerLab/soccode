@@ -1,4 +1,4 @@
-function output = createPatternStimulus(sz, relCutoff, bpfilter)
+function [output, edge, thresh, res] = createPatternStimulus(sz, relCutoff, bpfilter)
 % CREATE PATTERN STIMULUS
 %   sz - the desired image size
 %   relCutoff - Define a relative cutoff in terms of the available frequencies
@@ -16,7 +16,7 @@ function output = createPatternStimulus(sz, relCutoff, bpfilter)
 
     % Nice soft round filter:
     radius = relCutoff*size(im,1)/2;
-    mask = mkDisc(size(im), radius, mid, 60);
+    mask = mkDisc(size(im), radius, mid, radius/5);
 
     % Filter the image
     mdft = mask.*dft;
@@ -36,10 +36,10 @@ function output = createPatternStimulus(sz, relCutoff, bpfilter)
     % Filter convolutionally with bpfilter; it's too small to be intended in
     % the Fourier domain
     edgePad = padarray(edge, floor(size(bpfilter)/2), 'circular', 'both');
-    output = conv2(edgePad, bpfilter, 'valid');
+    output = conv2(edgePad, -1*bpfilter, 'valid');
 
     % Visualize the images (or comment this out to not do so)
-    tinybp = placematrix(zeros(size(edge)), bpfilter, mid - size(bpfilter)/2);
-    toShow = {im, ifft2(ifftshift(mask)), res, double(thresh), edge, bpfilter, tinybp, output};
-    showFourier(toShow);
+%     tinybp = placematrix(zeros(size(edge)), bpfilter, mid - size(bpfilter)/2);
+%     toShow = {im, ifft2(ifftshift(mask)), res, double(thresh), edge, bpfilter, tinybp, output};
+%     showFourier(toShow);
 end

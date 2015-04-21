@@ -1,13 +1,16 @@
-function results = modelfittingContrastIm(modelhandle, betamnToUse, imToUse)
-% Virtually unchanged from soc_modelfitting.m
+function results = modelfittingOTS(modelhandle, betamnToUse, imCell)
+% Model fitting for the OTS model. Needs to be passed the full set of
+% images at different a and e values, so it can try out each
+
+% imCell should be a cell array of transposed pxv's
+
     res = 90;
-    
     X = (1+res)/2;
     Y = (1+res)/2;
     D = res/4*sqrt(0.5);
-    G = 10; % why is this set so high??
-    Ns = [.05 .1 .3 .5]; % uncomment me to re-enable 16-fold resampling
-    Cs = [.4 .7 .9 .95];
+    G = 10;
+    Ns = 0.5; % [.05 .1 .3 .5]; %
+    Cs = 0.9; % [.4 .7 .9 .95];
     seeds = [];
     for frame=1:length(Ns)
       for q=1:length(Cs)
@@ -29,6 +32,9 @@ function results = modelfittingContrastIm(modelhandle, betamnToUse, imToUse)
     optimoptions = {'Algorithm' 'levenberg-marquardt' 'Display' 'off'};
     resampling = 0;
     metric = @(a,b) calccod(a,b,[],[],0);
+    
+    % temporary
+    imToUse = imCell{1, 1};
 
     % construct the options struct
     opt = struct( ...

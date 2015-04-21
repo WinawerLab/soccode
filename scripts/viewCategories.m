@@ -6,11 +6,19 @@
 
 %% Choose categories
 gratingNums = 176:180; gratingIdx = 1:5;
-patternNums = 181:184; patternIdx = 6:9;
+patternNums = [181, 182, 183, 85, 184]; patternIdx = 6:10;
+horizPatternNums = 261:263; horizPatternIdx = 11:13;
+noiseStripeNums = 266:268; noiseStripeIdx = 14:16;
 
 %% Load and resize images
-imFile = fullfile(rootpath, 'data/input/stimuli.mat');   
-imStack = loadImages(imFile, [gratingNums, patternNums]);
+imFile1 = fullfile(rootpath, 'data', 'input', 'stimuli.mat');   
+imStack1 = loadImages(imFile, [gratingNums, patternNums]);
+
+imFile2 = fullfile(rootpath, 'data', 'input', 'stimuli_2015_04_06.mat');   
+load(imFile2, 'stimuli');
+imStack2 = stimuli.imStack(:, :, 7:12, :);
+
+imStack = cat(3, imStack1, imStack2);
 imStack = resizeStack(imStack, 150, 30);
 imFlat = stackToFlat(imStack);
 
@@ -35,6 +43,8 @@ C = 0.95;
 % Average over a few receptive field locations
 cat1PredictionsAccumulate = zeros(length(gratingNums), 1);
 cat2PredictionsAccumulate = zeros(length(patternNums), 1);
+cat3PredictionsAccumulate = zeros(length(horizPatternNums), 1);
+cat4PredictionsAccumulate = zeros(length(noiseStripeNums), 1);
 
 for x = X
     for y = Y        
@@ -45,17 +55,33 @@ for x = X
 
         cat1PredictionsAccumulate = cat1PredictionsAccumulate + avgPredictions(gratingIdx);
         cat2PredictionsAccumulate = cat2PredictionsAccumulate + avgPredictions(patternIdx);
+        cat3PredictionsAccumulate = cat3PredictionsAccumulate + avgPredictions(horizPatternIdx);
+        cat4PredictionsAccumulate = cat4PredictionsAccumulate + avgPredictions(noiseStripeIdx);
     end
 end
 cat1Predictions = cat1PredictionsAccumulate / (numel(X)*numel(Y));
 cat2Predictions = cat2PredictionsAccumulate / (numel(X)*numel(Y));
+cat3Predictions = cat3PredictionsAccumulate / (numel(X)*numel(Y));
+cat4Predictions = cat4PredictionsAccumulate / (numel(X)*numel(Y));
 
 %% Plot it
 figure; hold on;
-bar(1:numel(gratingIdx), cat1Predictions, 'r');
-bar(numel(gratingIdx)+1:numel(gratingIdx)+numel(patternIdx), cat2Predictions, 'b');
+bar(gratingIdx(1):gratingIdx(end), cat1Predictions, 'r');
+bar(patternIdx(1):patternIdx(end), cat2Predictions, 'b');
+bar(horizPatternIdx(1):horizPatternIdx(end), cat3Predictions, 'm');
+bar(noiseStripeIdx(1):noiseStripeIdx(end), cat4Predictions, 'c');
+
 ylim([0 3]);
 xlimit=get(gca,'xlim');
 plot(xlimit,[mean(cat1Predictions), mean(cat1Predictions)], 'r');
 plot(xlimit,[mean(cat2Predictions), mean(cat2Predictions)], 'b');
-legend('Gratings', 'Patterns');
+plot(xlimit,[mean(cat3Predictions), mean(cat3Predictions)], 'm');
+plot(xlimit,[mean(cat4Predictions), mean(cat4Predictions)], 'c');
+legend('Gratings', 'Patterns', 'Horizontal-aperture patterns', 'Noise stripes');
+
+%% My personal predictions before running the above:
+% Our model will care only about underlying orientation, not aperture shape
+% and thus the windowed squiggles will act like squiggles; the horiz will
+% act like gratings
+% and the brain will...
+% do the same?
