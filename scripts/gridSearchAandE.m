@@ -19,11 +19,11 @@ bestV1 = find(strcmp(roilabels(roi(voxNums)), 'V1'));
 bestV2 = find(strcmp(roilabels(roi(voxNums)), 'V2'));
 bestV3 = find(strcmp(roilabels(roi(voxNums)), 'V3'));
 
-v1VoxNums = bestV1(1:20);
-v2VoxNums = bestV2(1:20);
-v3VoxNums = bestV3(1:20);
-%voxNums = [v1VoxNums, v2VoxNums, v3VoxNums];
-voxNums = 31; % TODO do all voxels!
+v1VoxNums = bestV1(1:10);
+v2VoxNums = bestV2(1:10);
+v3VoxNums = bestV3(1:10);
+%voxNums = [v1VoxNums, v2VoxNums, v3VoxNums]; % 30 voxels per brain
+voxNums = 31; % For testing purposes
 
 %% Choose a subset of images
 load(fullfile(rootpath, 'code/visualization/stimuliNames.mat'), 'stimuliNames')
@@ -57,7 +57,8 @@ end
 r = 1;
 s = 0.5;
 avals = [0, 0.25, 0.5, 0.75, 1];
-evals = [1, 2, 3, 4, 8, 12, 16];
+%evals = [1, 2, 3, 4, 8, 12, 16];
+evals = [1, 2, 4, 8, 16]; % This will be 4*5 + 1 = 21 combinations in the grid
 
 inputdir = 'data/preprocessing/2015-03-11';
 outputdir = ['data/modelfits/', datestr(now,'yyyy-mm-dd')];
@@ -101,7 +102,8 @@ for a = avals
             betamnTrain = betamnToUse(:, idxTrain);
             betamnTest = betamnToUse(:, idxTest);
             
-            results.foldResults(fold) = modelfittingContrastIm(modelfun, betamnTrain, imTrain);
+            tempResults = modelfittingContrastIm(modelfun, betamnTrain, imTrain);
+            results.foldResults(fold).params = tempResults.params;
             results.foldResults(fold).foldNumber = fold;
             results.foldResults(fold).imNumsTrain = imNumsToUse(idxTrain);
             results.foldResults(fold).imNumsTest = imNumsToUse(idxTest);
