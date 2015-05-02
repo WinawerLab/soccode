@@ -5,8 +5,8 @@ function results = modelfittingContrastIm(modelhandle, betamnToUse, imToUse)
     X = (1+res)/2;
     Y = (1+res)/2;
     D = res/4*sqrt(0.5);
-    G = 10; % why is this set so high??
-    Ns = [.05 .1 .3 .5]; % uncomment me to re-enable 16-fold resampling
+    G = 10;
+    Ns = [.05 .1 .3 .5];
     Cs = [.4 .7 .9 .95];
     seeds = [];
     for frame=1:length(Ns)
@@ -26,13 +26,14 @@ function results = modelfittingContrastIm(modelhandle, betamnToUse, imToUse)
          % Second row reuses params without transformation.  The @(ss) ss
          % are no-ops.
          
-    optimoptions = {'Algorithm' 'levenberg-marquardt' 'Display' 'off'};
-    resampling = 0;
+    %optimoptions = {'Algorithm' 'levenberg-marquardt' 'Display' 'off'};
+    optimoptions = {'Algorithm' 'trust-region-reflective' 'Display' 'off'};
     metric = @(a,b) calccod(a,b,[],[],0);
+    
+    resampling = 0;
 
     % construct the options struct
     opt = struct( ...
-      'outputdir',    'temp', ...
       'stimulus',     imToUse, ...
       'data',         betamnToUse', ...
       'model',        {model}, ...
@@ -40,6 +41,7 @@ function results = modelfittingContrastIm(modelhandle, betamnToUse, imToUse)
       'optimoptions', {optimoptions}, ...
       'resampling',   resampling, ...
       'metric',       metric);
+
 
     results = fitnonlinearmodel(opt);
    

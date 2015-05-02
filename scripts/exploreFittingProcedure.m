@@ -145,7 +145,7 @@ end
 actual = betamnToUse;
 guesses = predictionsA1E4;
 ss_tot = sum((actual - mean(actual)).^2); % one number
-ss_exp = sum((guesses - mean(actual)).^2, 2); % sixteen numbers
+%ss_exp = sum((guesses - mean(actual)).^2, 2); % sixteen numbers
 ss_res = sum(bsxfun(@minus, actual, guesses).^2, 2); % sixteen numbers
 r2_A1E4 = 1 - ss_res./ss_tot;
 
@@ -231,7 +231,7 @@ modelfittingPrfOnly(modelfun, betamnToUse(:, idxSpace), imCell{1, 4}(idxSpace, :
 % This did NOT go as well! At all!
 
 %% What if we blur them?
-spaceImages = imCell{1,4}(idxSpace,:,:);
+spaceIm ages = imCell{1,4}(idxSpace,:,:);
 % TODO start here
 
 %% What if we leave out a random 10%?
@@ -267,3 +267,6 @@ results = modelfittingGivenPrf(modelfun, betamnToUse(:, randIdx), imCell{1, 4}(r
 % [23 54 55 61 63 64 76 78 79 84 88 96 98 115 129 144]
 
 %% Do a CSS model fit on *just* the contrast images
+modelcss = get_socmodel_original(90);
+%results = modelfittingOTS(modelfun, betamnToUse, imCell);
+    % Still under construction
