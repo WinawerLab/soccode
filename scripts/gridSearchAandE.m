@@ -6,6 +6,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+function gridSearchAandE(voxNum)
 %% Dataset
 datasetNum = 3;
 dataset = ['dataset', num2str(datasetNum, '%02d'), '.mat'];
@@ -22,8 +23,11 @@ bestV3 = find(strcmp(roilabels(roi(voxNums)), 'V3'));
 v1VoxNums = bestV1(1:10);
 v2VoxNums = bestV2(1:10);
 v3VoxNums = bestV3(1:10);
-%voxNums = [v1VoxNums, v2VoxNums, v3VoxNums]; % 30 voxels per brain
-voxNums = 31; % For testing purposes
+voxNums = [v1VoxNums, v2VoxNums, v3VoxNums]; % 30 voxels per brain
+%voxNums = 31; % For testing purposes
+
+voxNums = voxNum; % conversion to function
+display(['voxNum: ', numstr(voxNum)])
 
 %% Choose a subset of images
 load(fullfile(rootpath, 'code/visualization/stimuliNames.mat'), 'stimuliNames')
@@ -61,7 +65,7 @@ avals = [0, 0.25, 0.5, 0.75, 1];
 evals = [1, 2, 4, 8, 16]; % This will be 4*5 + 1 = 21 combinations in the grid
 
 inputdir = 'data/preprocessing/2015-03-11';
-outputdir = ['data/modelfits/', datestr(now,'yyyy-mm-dd')];
+outputdir = ['data/modelfits/', datestr(now,'yyyy-mm-dd'), '/vox', num2str(voxNum)];
 if ~exist(fullfile(rootpath, outputdir), 'dir')
     mkdir(fullfile(rootpath, outputdir));
 end
@@ -122,4 +126,6 @@ for a = avals
         'results');
     end
 end
+
+end % end function
 
