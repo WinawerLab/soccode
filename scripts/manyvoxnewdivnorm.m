@@ -132,4 +132,5 @@ plot(t100Predictions(:,voxIdx),'go','LineWidth',3);
 ylabel('BOLD signal (% change)');
 title('Data and model fit');
 
-addXlabels(imNumsToUse);
+load(fullfile(rootpath, 'code/visualization/stimuliNames.mat'), 'stimuliNames')
+addXlabels(imNumsToUse, stimuliNames);

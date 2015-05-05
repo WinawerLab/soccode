@@ -20,7 +20,9 @@ betamnIdx = arrayfun(@(x) find(imNumsDataset == x,1,'first'), imNumsToUse);
 voxNum = 78; % a V1 voxel with good SNR
 fh = setupBetaFig();
 bar(betamn(voxNum, :));
-addXlabels(imNumsToUse);
+
+load(fullfile(rootpath, 'code/visualization/stimuliNames.mat'), 'stimuliNames')
+addXlabels(imNumsToUse, stimuliNames);
 
 betamnToUse = betamn(voxNum, betamnIdx);
 
@@ -160,7 +162,7 @@ setupBetaFig()
 bar(betamnToUse);
 ylabel('BOLD signal (% change)');
 title('Data and model fit, A=0');
-addXlabels(imNumsToUse);
+addXlabels(imNumsToUse, stimuliNames);
 
 % Individual lines with gradated colors
 hold all;
@@ -181,7 +183,7 @@ setupBetaFig()
 bar(betamnToUse);
 ylabel('BOLD signal (% change)');
 title('Data and model fit, A=1 E=4');
-addXlabels(imNumsToUse);
+addXlabels(imNumsToUse, stimuliNames);
 hold all;
 
 colorset = flipud(hot());
