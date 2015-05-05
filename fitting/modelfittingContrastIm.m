@@ -27,7 +27,8 @@ function results = modelfittingContrastIm(modelhandle, betamnToUse, imToUse)
          % are no-ops.
          
     optimoptions = {'Algorithm' 'levenberg-marquardt' 'Display' 'off'};
-    %optimoptions = {'Algorithm' 'trust-region-reflective' 'Display' 'off'};
+%    optimoptions = {'Algorithm' 'trust-region-reflective' 'Display' 'off'};
+
     metric = @(a,b) calccod(a,b,[],[],0);
     
     resampling = 0;
