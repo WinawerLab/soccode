@@ -1,4 +1,4 @@
-function xlabels = addXlabels(imNums)
+function xlabels = addXlabels(imNums, stimuliNames)
 %GEN X LABELS - Generate X-axis labels based on stimuli names and indices
 %
 %   Adds labels to the x axis, based on the names of the categories as
@@ -13,8 +13,7 @@ function xlabels = addXlabels(imNums)
 %   This function does not create a plot, but modifies an existing plot.
 %
 %       imNums - An array of category indices
- 
-    load(fullfile(rootpath, 'code/visualization/stimuliNames.mat'), 'stimuliNames')
+%       stimuliNames - A cell array of stimulus names for each imNum
     
     xlabels = stimuliNames(imNums); % take only the ones currently in use
     

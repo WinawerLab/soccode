@@ -46,5 +46,19 @@ end
 % 74:78 - 'zsp' zebra sparse
 % 79:82 - 'coh' NEW, variable coherence
 % 82:86 - 'nm' NEW, superimposed noise and zebra
-
 end
+
+% %% Name the ECoG images! Code snippet run once, need not be run again:
+% stimuliNamesEcog = cell(1, 86);
+% stimuliNamesEcog(1:38) = deal({'pattern_space'});
+% stimuliNamesEcog(39:46) = deal({'grating_ori'});
+% stimuliNamesEcog(47:50) = deal({'grating_contrast'});
+% stimuliNamesEcog(51:54) = deal({'plaid_contrast'});
+% stimuliNamesEcog(55:58) = deal({'circular_contrast'});
+% stimuliNamesEcog(59:68) = deal({'pattern_contrast'});
+% stimuliNamesEcog(69:73) = deal({'grating_sparse'});
+% stimuliNamesEcog(74:78) = deal({'pattern_sparse'});
+% stimuliNamesEcog(79:82) = deal({'coherence'});
+% stimuliNamesEcog(82:86) = deal({'noise_zebra'});
+% 
+% save(fullfile(rootpath, 'code', 'visualization', 'stimuliNamesEcog.mat'), 'stimuliNamesEcog');

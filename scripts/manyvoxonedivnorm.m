@@ -123,6 +123,6 @@ end
 
 %% Where do they differ most?
 diff = mean(newPredictions-oldPredictions, 2);
-setupBetaFig; bar(diff); addXlabels(imNumsToUse);
+setupBetaFig; bar(diff); addXlabels(imNumsToUse, stimuliNames);
 
 %% Plot with betamns
