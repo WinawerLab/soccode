@@ -26,8 +26,8 @@ function results = modelfittingContrastIm(modelhandle, betamnToUse, imToUse)
          % Second row reuses params without transformation.  The @(ss) ss
          % are no-ops.
          
-    %optimoptions = {'Algorithm' 'levenberg-marquardt' 'Display' 'off'};
-    optimoptions = {'Algorithm' 'trust-region-reflective' 'Display' 'off'};
+    optimoptions = {'Algorithm' 'levenberg-marquardt' 'Display' 'off'};
+%    optimoptions = {'Algorithm' 'trust-region-reflective' 'Display' 'off'};
     metric = @(a,b) calccod(a,b,[],[],0);
     
     resampling = 0;

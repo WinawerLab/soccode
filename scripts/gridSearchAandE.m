@@ -27,7 +27,7 @@ voxNums = [v1VoxNums, v2VoxNums, v3VoxNums]; % 30 voxels per brain
 %voxNums = 31; % For testing purposes
 
 voxNums = voxNum; % conversion to function
-display(['voxNum: ', numstr(voxNum)])
+display(['voxNum: ', num2str(voxNum)])
 
 %% Choose a subset of images
 load(fullfile(rootpath, 'code/visualization/stimuliNames.mat'), 'stimuliNames')
