@@ -69,21 +69,26 @@ avals = [0, 0.25, 0.5, 0.75, 1];
 evals = [1, 2, 4, 8, 16]; % This will be 4*5 + 1 = 21 combinations in the grid
 
 inputdir = 'data/preprocessing/2015-03-11';
-outputdir = ['data/modelfits/2015-05-04/vox', num2str(voxNum)];
+outputdir = ['data/modelfits/2015-05-05/vox', num2str(voxNum)];
+%outputdir = ['data/modelfits/2015-05-04/vox', num2str(voxNum)];
 %outputdir = ['data/modelfits/', datestr(now,'yyyy-mm-dd'), '/vox', num2str(voxNum)];
 
 %% Loop over a and e values and run folds
 for a = avals
     for e = evals
+
         %% Skip the extra avals
         if (a == 0) && (e > 1)
             continue;
         end
-        
+
+	disp(['a = ', num2str(a), ', e = ', num2str(e)]);
+
         %% Load the images
         [imAll, imFileName] = loadOneDivnormIm(inputdir, r, s, a, e);
         
         %% ******** LOAD ********* the results struct
+        disp('Loading...')
         load(fullfile(rootpath, outputdir, ...
         ['aegridsearch-a', num2str(a), '-e', num2str(e), '-subj', num2str(datasetNum), '.mat']), ...
         'results');
