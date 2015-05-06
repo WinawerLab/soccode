@@ -4,7 +4,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-dataloc = fullfile(rootpath, 'data', 'modelfits', '2015-05-04');
+dataloc = fullfile(rootpath, 'data', 'modelfits', '2015-05-05');
 
 datasetNum = 3;
 
@@ -34,7 +34,7 @@ for voxIdx = 1:length(voxNums)
             try
                 load(fullfile(dataloc, folder, filename));
                 
-                aggregateResults(aidx, eidx, voxIdx) = results.xvalr2;
+                aggregateResults(aidx, eidx, voxIdx) = results.concatR2;
             end
             
         end
@@ -55,6 +55,8 @@ figure; plot(avals, byA, 'o-'); title('Results by A')
 byE = nanmean(im(2:end,:), 1);
 figure; plot(evals, byE, 'o-'); title('Results by E')
 
+% TAKEAWAYS: All of these are better
+
 %% For each voxel, how big is the best minus worst difference?
 mins = min(min(aggregateResults, [], 2), [], 1);
 maxs = max(max(aggregateResults, [], 2), [], 1);
@@ -65,7 +67,7 @@ figure; hist(diffs(:));
 %% What if we just pick one, which one do we pick?
 origs = squeeze(aggregateResults(1, 1, :));
 %new = squeeze(aggregateResults(2, 2, :));
-new = squeeze(aggregateResults(3, 3, :));
+new = squeeze(aggregateResults(2, 3, :));
 
 figure; hold on;
 unityline = linspace(0, 1, 100);
@@ -73,5 +75,3 @@ plot(unityline, unityline, 'k-');
 plot(origs(origs > new), new(origs > new), 'ro');
 plot(origs(origs <= new), new(origs <= new), 'go');
 xlabel('Original'); ylabel('New');
-
-% TAKEAWAYS: All of these are better

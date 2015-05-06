@@ -76,3 +76,33 @@ for ii = 1:size(ims.stimuli, 3)
     pause(0.5);
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Category R2s
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Choose one canonical A and E
+aOld = 0;
+eOld = 1;
+
+aNew = 0.5;
+eNew = 4;
+
+% avals = [0.25, 0.5, 0.75, 1];
+% evals = [1, 2, 4, 8, 16]; 
+% 
+% for aNew = avals
+%     for eNew = evals
+
+categoryR2sOld = processGridSearchCategory(aOld, eOld);
+categoryR2sNew = processGridSearchCategory(aNew, eNew);
+
+figure; hold on;
+unityline = linspace(0, 1, 100);
+plot(unityline, unityline, 'k-');
+plot(categoryR2sOld(categoryR2sOld > categoryR2sNew), categoryR2sNew(categoryR2sOld > categoryR2sNew), 'ro');
+plot(categoryR2sOld(categoryR2sOld <= categoryR2sNew), categoryR2sNew(categoryR2sOld <= categoryR2sNew), 'go');
+xlabel('Original'); ylabel('New');
+title(['Category-specific R^2 ', num2str(aNew), ' ', num2str(eNew)]);
+
+%     end
+% end
