@@ -65,11 +65,13 @@ figure; hist(diffs(:));
 %% What if we just pick one, which one do we pick?
 origs = squeeze(aggregateResults(1, 1, :));
 %new = squeeze(aggregateResults(2, 2, :));
-new = squeeze(aggregateResults(3, 2, :));
+new = squeeze(aggregateResults(3, 3, :));
 
 figure; hold on;
 unityline = linspace(0, 1, 100);
 plot(unityline, unityline, 'k-');
-plot(origs, new, 'o');
+plot(origs(origs > new), new(origs > new), 'ro');
+plot(origs(origs <= new), new(origs <= new), 'go');
 xlabel('Original'); ylabel('New');
 
+% TAKEAWAYS: All of these are better
