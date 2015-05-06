@@ -1,4 +1,4 @@
-function [r2, residuals] = computeR2(predictions, actual, useThisMean)
+function [r2, residuals, ss_res, ss_tot] = computeR2(predictions, actual, useThisMean)
 % COMPUTE R^2: Compare this model to the "mean" model;
 %   compute and return 1 - ss_res./ss_tot where ss_res is residual
 %   sum of squares for this model, and ss_tot is for the "mean" model

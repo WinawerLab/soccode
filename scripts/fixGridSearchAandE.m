@@ -102,15 +102,36 @@ for a = avals
             betamnTest = betamnToUse(:, idxTest);
             
             predictions = predictResponses(imTest, results.foldResults(fold).params, modelfun);
+            useThisMean = mean(betamnToUse);    
+            [r2test, ~, ss_res, ss_tot] = computeR2(predictions, betamnTest, useThisMean);
             
-            useThisMean = mean(betamnToUse);
-            [r2test, ~] = computeR2(predictions, betamnTest, useThisMean);            
+            results.foldResults(fold).predictions = predictions;
             results.foldResults(fold).r2test = r2test;
+            results.foldResults(fold).ss_res = ss_res;
+            results.foldResults(fold).ss_tot = ss_tot;
         end
         
-        %% Estimate average xval r^2
+        %% Estimate average xval r^2 (TODO this is just an awful idea and very wrong)
         results.xvalr2 = mean([results.foldResults.r2test]);
-             
+        
+        %% Concatenate the cross-validated results (and get a *useful* R2!)
+        results.concatPredictions = zeros(1, length(betamnToUse));
+        for fold = 1:nFolds
+            idxTest = folds{fold};
+            results.concatPredictions(idxTest) = results.foldResults(fold).predictions;
+        end
+        results.concatR2 = computeR2(results.concatPredictions, betamnToUse);
+        
+        %% Here's another way that I hope computes the same thing
+        accumSSres = 0;
+        accumSStot = 0;
+        for fold = 1:nFolds
+            accumSSres = accumSSres + results.foldResults(fold).ss_res;
+            accumSStot = accumSStot + results.foldResults(fold).ss_tot;
+        end
+        results.accumR2 = 1 - accumSSres / accumSStot;
+        
+        %% Save out
         save(fullfile(rootpath, outputdir, ...
         ['aegridsearch-a', num2str(a), '-e', num2str(e), '-subj', num2str(datasetNum), '.mat']), ...
         'results');
