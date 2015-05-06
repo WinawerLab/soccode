@@ -1,14 +1,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Experiment: Grid search a and e, across voxels
-%   - Run multiple a and e values, and compare best R^2 with each
-%   - Do this for a variety of voxels and save the results
-%   - Use cross-validated R^2 for the comparison
+% Experiment: Leave-out-out cross-validation for a given A and E
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function gridSearchAandE(voxNum)
 %% Dataset
-datasetNum = 3;
+datasetNum = 4;
 dataset = ['dataset', num2str(datasetNum, '%02d'), '.mat'];
 load(fullfile(rootpath, ['data/input/fmri_datasets/', dataset]),'betamn','betase', 'roi', 'roilabels');
 
@@ -20,16 +17,23 @@ bestV1 = find(strcmp(roilabels(roi(voxNums)), 'V1'));
 bestV2 = find(strcmp(roilabels(roi(voxNums)), 'V2'));
 bestV3 = find(strcmp(roilabels(roi(voxNums)), 'V3'));
 
-v1VoxNums = bestV1(1:10);
-v2VoxNums = bestV2(1:10);
-v3VoxNums = bestV3(1:10);
+v1VoxNums = bestV1(11:20);
+v2VoxNums = bestV2(11:20);
+v3VoxNums = bestV3(11:20);
 voxNums = [v1VoxNums, v2VoxNums, v3VoxNums]; % 30 voxels per brain
 
+% DATASET 3:
 % Best 10 voxels per area:
 % voxNums = [31,42,59,71,72,77,81,83,89,90,10,19,22,29,30,33,35,36,38,47,1,3,7,8,9,12,15,16,18,20]
 % Next best 10 per area:
 % voxNums = [94,104,115,116,122,125,131,142,143,148,57,60,62,65,68,69,73,76,78,79,24,25,26,28,32,34,37,40,41,43]
 %voxNums = 31; % For testing purposes
+
+% DATASET 4:
+% Best 10:
+% voxNums = [8,47,69,89,101,140,167,181,182,184,15,40,56,106,112,117,131,142,178,180,9,29,41,45,51,65,84,86,88,91]
+% Next best 10:
+% voxNums = [185,207,215,217,220,243,248,257,279,281,191,193,212,213,226,245,250,251,256,266,95,103,104,107,120,128,138,141,144,157]
 
 voxNums = voxNum; % conversion to function
 display(['voxNum: ', num2str(voxNum)])
