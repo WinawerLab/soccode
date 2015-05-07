@@ -5,7 +5,7 @@
 
 function gridSearchAandE(voxNum)
 %% Dataset
-datasetNum = 4;
+datasetNum = 3;
 dataset = ['dataset', num2str(datasetNum, '%02d'), '.mat'];
 load(fullfile(rootpath, ['data/input/fmri_datasets/', dataset]),'betamn','betase', 'roi', 'roilabels');
 
@@ -13,7 +13,7 @@ load(fullfile(rootpath, ['data/input/fmri_datasets/', dataset]),'betamn','betase
 betaSse = sum(betase, 2);
 [y,voxNums] = sort(betaSse);
 
-bestV1 = find(strcmp(roilabels(roi(voxNums)), 'V1'));
+bestV1 = find(strcmp(roilabels(roi(voxNums)), 'V1')); % ugh, "find" has unsorted them
 bestV2 = find(strcmp(roilabels(roi(voxNums)), 'V2'));
 bestV3 = find(strcmp(roilabels(roi(voxNums)), 'V3'));
 
@@ -104,6 +104,13 @@ for a = avals
         results.folds = folds;
         results.foldResults = struct([]); % struct arrays ftw
         
+        % Added later, retroactively supplied in existing data:
+        results.imNumsDataset = imNumsDataset;
+        results.catToUse = catToUse;
+        results.datasetIdxToUse = imIdxToUse;
+        results.imNumsToUse = imNumsDataset(imIdxToUse);
+        results.betamnToUse = betamn(voxNums, imIdxToUse);
+        
         %% Run all 10 folds of this a/e
         for fold = 1:nFolds
             allFolds = 1:nFolds;
@@ -140,7 +147,7 @@ for a = avals
         results.concatPredictions = zeros(length(betamnToUse));
         for fold = 1:nFolds
             idxTest = folds{fold};
-            results.concatPredictions(idxTest) = foldResults(fold).predictions;
+            results.concatPredictions(idxTest) = results.foldResults(fold).predictions;
         end
         results.concatR2 = computeR2(results.concatPredictions, betamnToUse);
         

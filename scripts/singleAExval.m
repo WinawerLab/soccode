@@ -129,7 +129,7 @@ results.xvalr2 = mean([results.foldResults.r2test]);
 results.concatPredictions = zeros(length(betamnToUse));
 for fold = 1:nFolds
     idxTest = folds{fold};
-    results.concatPredictions(idxTest) = foldResults(fold).predictions;
+    results.concatPredictions(idxTest) = results.foldResults(fold).predictions;
 end
 results.concatR2 = computeR2(results.concatPredictions, betamnToUse);
 

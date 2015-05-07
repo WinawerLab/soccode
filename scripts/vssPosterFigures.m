@@ -13,6 +13,11 @@ catToUse = {'pattern_space', 'pattern_central', 'grating_ori', ...
            'pattern_contrast', ... % skip naturalistic ...
            'grating_sparse', 'pattern_sparse'}; % skip noise space/halves
 
+% catToUse = {'pattern_space', 'pattern_central', 'grating_ori', ...
+%            'grating_contrast', 'plaid_contrast', 'circular_contrast', ...
+%            'pattern_contrast', 'non_geometric_small', 'scenes', ...
+%            'grating_sparse', 'pattern_sparse', 'noise_space', 'noise_grating_halves'};
+
 load(fullfile(rootpath, 'code', 'visualization', 'stimuliNames.mat'), 'stimuliNames');
        
 imIdxToUse = arrayfun(@(idx) strInCellArray(stimuliNames{idx}, catToUse), imNumsDataset);
@@ -106,3 +111,153 @@ title(['Category-specific R^2 ', num2str(aNew), ' ', num2str(eNew)]);
 
 %     end
 % end
+
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Residuals
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+oldResiduals = processGridSearchResiduals(aOld, eOld);
+newResiduals = processGridSearchResiduals(aNew, eNew);
+
+setupBetaFig;
+bar(nanmean(oldResiduals, 2));
+addXlabels(imNumsToUse, stimuliNames);
+title('Old residuals, avg')
+
+setupBetaFig;
+bar(nanmean(newResiduals, 2));
+addXlabels(imNumsToUse, stimuliNames);
+title('New residuals, avg')
+
+setupBetaFig;
+change = nanmean(newResiduals - oldResiduals, 2);
+bar(change);
+addXlabels(imNumsToUse, stimuliNames);
+title('Average of difference between residuals')
+
+betterOrWorse = bsxfun(@times, -1*sign(oldResiduals), (newResiduals - oldResiduals)); 
+setupBetaFig;
+bar(nanmean(betterOrWorse, 2));
+addXlabels(imNumsToUse, stimuliNames);
+title('Better? Or worse?')
+
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Plot cross-validated predictions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+dataloc = fullfile(rootpath, 'data', 'modelfits', '2015-05-05');
+voxNum = 9;
+datasetNum = 3;
+folder = ['vox', num2str(voxNum)];
+
+filename = ['aegridsearch-a', num2str(aOld), '-e', num2str(eOld), '-subj', num2str(datasetNum), '.mat'];
+load(fullfile(dataloc, folder, filename));
+oldPredictions = results.concatPredictions;
+
+filename = ['aegridsearch-a', num2str(aNew), '-e', num2str(eNew), '-subj', num2str(datasetNum), '.mat'];
+load(fullfile(dataloc, folder, filename));
+newPredictions = results.concatPredictions;
+
+setupBetaFig;
+bar(datasets{1}.vals(voxNum, :));
+% plot(oldPredictions, 'ro');
+% plot(newPredictions, 'go');
+addXlabels(imNumsToUse, stimuliNames);
+
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% In-category means, two models
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+dataloc = fullfile(rootpath, 'data', 'modelfits', '2015-05-05');
+datasetNum = 3;
+
+voxNums = [31,42,59,71,72,77,81,83,89,90,10,19,22,29,30,33,35,36,38,47,1,3,7,8,9,12,15,16,18,20];
+
+imNumsDataset = 70:225;
+load(fullfile(rootpath, 'code/visualization/stimuliNames.mat'), 'stimuliNames')
+catTrain = {'pattern_space', 'pattern_central', 'grating_ori', ...
+           'grating_contrast', 'plaid_contrast', 'circular_contrast', ...
+           'pattern_contrast', 'grating_sparse', 'pattern_sparse'}; % omit naturalistic and noise space/halves
+idxTrain = find(arrayfun(@(idx) strInCellArray(stimuliNames{idx}, catTrain), imNumsDataset));
+
+imNumsCat = [176, 177, 178, 179, 180, 181, 182, 183, 85, 184];
+idxCat = arrayfun(@(x) find(imNumsDataset == x,1,'first'), imNumsCat);
+
+dataset = ['dataset', num2str(datasetNum, '%02d'), '.mat'];
+load(fullfile(rootpath, ['data/input/fmri_datasets/', dataset]),'betamn','betase', 'roi', 'roilabels');
+betamnTrain = betamn(voxNums, idxTrain);
+betamnCat = betamn(voxNums, idxCat);
+
+oldPredictions = NaN*ones(length(voxNums), length(idxTrain));
+newPredictions = NaN*ones(length(voxNums), length(idxTrain));
+
+catPredictionsOld = NaN*ones(length(voxNums), length(idxCat));
+catPredictionsNew = NaN*ones(length(voxNums), length(idxCat));
+for voxIdx = 1:length(voxNums);
+    voxNum = voxNums(voxIdx);
+    folder = ['vox', num2str(voxNum)];
+
+    filename = ['aegridsearch-a', num2str(aOld), '-e', num2str(eOld), '-subj', num2str(datasetNum), '.mat'];
+    try
+        load(fullfile(dataloc, folder, filename));
+    catch
+        continue;
+    end
+    oldPredictions(voxIdx, :) = results.concatPredictions;
+
+    filename = ['aegridsearch-a', num2str(aNew), '-e', num2str(eNew), '-subj', num2str(datasetNum), '.mat'];
+    try
+        load(fullfile(dataloc, folder, filename));
+    catch
+        continue;
+    end
+    newPredictions(voxIdx, :) = results.concatPredictions;
+    
+    subIdxCat = arrayfun(@(x) find(idxTrain == x,1,'first'), idxCat);
+    
+    catPredictionsOld(voxIdx, :) = oldPredictions(voxIdx, subIdxCat);
+    catPredictionsNew(voxIdx, :) = newPredictions(voxIdx, subIdxCat);
+end
+
+%%
+oldAvg = nanmean(catPredictionsOld, 1);
+newAvg = nanmean(catPredictionsNew, 1);
+
+figure; hold on;
+bar([oldAvg(1:5), zeros(1, 5)], 'r');
+bar([zeros(1,5), oldAvg(6:10)], 'b');
+title('Old')
+
+figure; hold on;
+bar([newAvg(1:5), zeros(1, 5)], 'r');
+bar([zeros(1,5), newAvg(6:10)], 'b');
+title('New')
+
+
+%%
+
+setupBetaFig;
+bar(datasets{1}.vals(voxNum, :));
+% plot(oldPredictions, 'ro');
+% plot(newPredictions, 'go');
+addXlabels(imNumsDataset(idxTrain), stimuliNames);
+
+%%
+setupBetaFig;
+bar(mean(betamnTrain, 1));
+plot(nanmean(oldPredictions, 1), 'ro');
+plot(nanmean(newPredictions, 1), 'go');
+addXlabels(imNumsDataset(idxTrain), stimuliNames);
+
+%% Recover ancient history
+findVoxel = 31;
+ancient = load('/Local/Users/olsson/Dropbox/Research/code/SOC-new/data/modelfits/2014-06-24/results_V1_all_R=1_S=0pt5.mat');
+voxIdx = find(ancient.voxelFitIxs == findVoxel);
+ancientParams = ancient.results.params(:, :, voxIdx);
+
+folder = ['vox', num2str(findVoxel)];
+filename = ['aegridsearch-a', num2str(aOld), '-e', num2str(eOld), '-subj', num2str(datasetNum), '.mat'];
+load(fullfile(dataloc, folder, filename));
+
+oldPredictions = results.concatPredictions;
