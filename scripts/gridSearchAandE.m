@@ -3,37 +3,37 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function gridSearchAandE(voxNum)
+function gridSearchAandE(datasetNum, voxNum)
 %% Dataset
-datasetNum = 3;
 dataset = ['dataset', num2str(datasetNum, '%02d'), '.mat'];
 load(fullfile(rootpath, ['data/input/fmri_datasets/', dataset]),'betamn','betase', 'roi', 'roilabels');
 
 %% Choose good voxels
+v1Vox = find(strcmp(roilabels(roi), 'V1'));
+v2Vox = find(strcmp(roilabels(roi), 'V2'));
+v3Vox = find(strcmp(roilabels(roi), 'V3'));
+
 betaSse = sum(betase, 2);
-[y,voxNums] = sort(betaSse);
+[y,bestV1] = sort(betaSse(v1Vox));
+[y,bestV2] = sort(betaSse(v2Vox));
+[y,bestV3] = sort(betaSse(v3Vox));
 
-bestV1 = find(strcmp(roilabels(roi(voxNums)), 'V1')); % ugh, "find" has unsorted them
-bestV2 = find(strcmp(roilabels(roi(voxNums)), 'V2'));
-bestV3 = find(strcmp(roilabels(roi(voxNums)), 'V3'));
-
-v1VoxNums = bestV1(11:20);
-v2VoxNums = bestV2(11:20);
-v3VoxNums = bestV3(11:20);
-voxNums = [v1VoxNums, v2VoxNums, v3VoxNums]; % 30 voxels per brain
+v1VoxNums = bestV1(1:10);
+v2VoxNums = bestV2(1:10);
+v3VoxNums = bestV3(1:10);
+voxNums = [v1VoxNums; v2VoxNums; v3VoxNums]; % 30 voxels per brain
 
 % DATASET 3:
-% Best 10 voxels per area:
-% voxNums = [31,42,59,71,72,77,81,83,89,90,10,19,22,29,30,33,35,36,38,47,1,3,7,8,9,12,15,16,18,20]
-% Next best 10 per area:
-% voxNums = [94,104,115,116,122,125,131,142,143,148,57,60,62,65,68,69,73,76,78,79,24,25,26,28,32,34,37,40,41,43]
-%voxNums = 31; % For testing purposes
+% First 10, all three areas:
+% [170,88,72,28,42,74,144,27,138,146,105,104,157,47,84,55,216,129,220,19,185,158,179,163,165,175,137,189,110,161]
+% Next 10, all three areas:
+% [120,129,119,111,114,121,78,195,107,11,51,61,224,218,150,46,24,210,158,233,169,162,183,159,200,202,115,121,93,124]
 
 % DATASET 4:
-% Best 10:
-% voxNums = [8,47,69,89,101,140,167,181,182,184,15,40,56,106,112,117,131,142,178,180,9,29,41,45,51,65,84,86,88,91]
-% Next best 10:
-% voxNums = [185,207,215,217,220,243,248,257,279,281,191,193,212,213,226,245,250,251,256,266,95,103,104,107,120,128,138,141,144,157]
+% First 10:
+% [76,38,65,109,81,16,80,61,66,15,20,53,136,50,21,54,51,80,66,146,46,217,101,14,82,204,202,100,90,130]
+% Next 10:
+% [57,52,64,63,39,48,58,85,138,35,17,55,117,34,86,118,123,56,110,83,40,149,43,185,146,187,42,10,210,45]
 
 voxNums = voxNum; % conversion to function
 display(['voxNum: ', num2str(voxNum)])
