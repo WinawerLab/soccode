@@ -6,6 +6,10 @@
 % Loading the data!
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+
+%%%%%%%%%%%% WARNING this all has bad indexing!! %%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %% fMRI - which images
 imNumsDataset = 70:225;
 catToUse = {'pattern_space', 'pattern_central', 'grating_ori', ...
@@ -255,9 +259,10 @@ findVoxel = 31;
 ancient = load('/Local/Users/olsson/Dropbox/Research/code/SOC-new/data/modelfits/2014-06-24/results_V1_all_R=1_S=0pt5.mat');
 voxIdx = find(ancient.voxelFitIxs == findVoxel);
 ancientParams = ancient.results.params(:, :, voxIdx);
+modelfun = get_socmodel_original(90);
+
 
 folder = ['vox', num2str(findVoxel)];
 filename = ['aegridsearch-a', num2str(aOld), '-e', num2str(eOld), '-subj', num2str(datasetNum), '.mat'];
 load(fullfile(dataloc, folder, filename));
-
 oldPredictions = results.concatPredictions;

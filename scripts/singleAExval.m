@@ -27,20 +27,16 @@ load(fullfile(rootpath, ['data/input/fmri_datasets/', dataset]),'betamn','betase
 voxNums = voxNum;
 display(['voxNum: ', num2str(voxNum)])
 
-%% Choose a subset of images
+%% Choose a subset of images / betas
 load(fullfile(rootpath, 'code/visualization/stimuliNames.mat'), 'stimuliNames')
 imNumsDataset = 70:225;
 
 catToUse = {'pattern_space', 'pattern_central', 'grating_ori', ...
            'grating_contrast', 'plaid_contrast', 'circular_contrast', ...
            'pattern_contrast', 'grating_sparse', 'pattern_sparse'}; % omit naturalistic and noise space/halves
-imIdxToUse = arrayfun(@(idx) strInCellArray(stimuliNames{idx}, catToUse), imNumsDataset);
-imNumsToUse = imNumsDataset(imIdxToUse);
-
-
-%% Load betas
-betamnIdxToUse = arrayfun(@(x) find(imNumsDataset == x,1,'first'), imNumsToUse);
-betamnToUse = betamn(voxNums, betamnIdxToUse);
+datasetIdxToUse = arrayfun(@(idx) strInCellArray(stimuliNames{idx}, catToUse), imNumsDataset);
+imNumsToUse = imNumsDataset(datasetIdxToUse);
+betamnToUse = betamn(voxNums, datasetIdxToUse);
 
 %% Acquire the desired modelfun
 modelfun = get_socmodel_original(90);
@@ -49,20 +45,20 @@ modelfun = get_socmodel_original(90);
 
 if strcmp(nFolds, 'leaveoneout')
     nFolds = length(imNumsToUse);
-    folds = cell(1, nFolds);
+    foldImNums = cell(1, nFolds);
     for fold = 1:nFolds
-        folds{fold} = fold;
+        foldImNums{fold} = imNumsToUse(fold);
     end
 else
 % NOTE - unless the random seed is re-initialized, this will do the same
 % thing every time!
-    shuffled = randperm(length(imNumsToUse));
-    folds = cell(1, nFolds);
+    shuffledImNums = imNumsToUse(randperm(length(imNumsToUse)));
+    foldImNums = cell(1, nFolds);
 
     for fold = 1:nFolds
-        start = round(length(shuffled)/nFolds * (fold-1)) + 1;
-        stop = round(length(shuffled)/nFolds * (fold));
-        folds{fold} = shuffled(start:stop);
+        start = round(length(shuffledImNums)/nFolds * (fold-1)) + 1;
+        stop = round(length(shuffledImNums)/nFolds * (fold));
+        foldImNums{fold} = shuffledImNums(start:stop);
     end
 end
 
@@ -77,7 +73,7 @@ if ~exist(fullfile(rootpath, outputdir), 'dir')
 end
         
 %% Load the images
-[imAll, imFileName] = loadOneDivnormIm(inputdir, r, s, a, e);
+[imAll, imFileName, imNumsLoad] = loadOneDivnormIm(inputdir, r, s, a, e);
 
 %% Set up a results struct
 results.voxNums = voxNums;
@@ -88,8 +84,14 @@ results.r = r;
 results.s = s;
 results.a = a;
 results.e = e;
-results.folds = folds;
+results.foldImNums = foldImNums;
 results.foldResults = struct([]); % struct arrays ftw
+
+results.imNumsDataset = imNumsDataset;
+results.catToUse = catToUse;
+results.datasetIdxToUse = datasetIdxToUse;
+results.imNumsToUse = imNumsToUse;
+results.betamnToUse = betamn(voxNums, datasetIdxToUse);
 
 %% Run all folds of this a/e
 for fold = 1:nFolds
@@ -97,20 +99,20 @@ for fold = 1:nFolds
     
     allFolds = 1:nFolds;
     trainFolds = allFolds ~= fold;
-    idxTrain = [folds{trainFolds}];
-    idxTest = folds{fold};
+    imNumsTrain = [foldImNums{trainFolds}];
+    imNumsTest = foldImNums{fold};
 
-    imTrain = imAll(idxTrain, :, :);
-    imTest = imAll(idxTest, :, :);
-
-    betamnTrain = betamnToUse(:, idxTrain);
-    betamnTest = betamnToUse(:, idxTest);
+    imTrain = imAll(convertIndex(imNumsLoad, imNumsTrain), :, :);
+    imTest = imAll(convertIndex(imNumsLoad, imNumsTest), :, :);
+            
+    betamnTrain = betamn(voxNums, convertIndex(imNumsDataset, imNumsTrain));
+    betamnTest = betamn(voxNums, convertIndex(imNumsDataset, imNumsTest));
 
     tempResults = modelfittingContrastIm(modelfun, betamnTrain, imTrain);
     results.foldResults(fold).params = tempResults.params;
     results.foldResults(fold).foldNumber = fold;
-    results.foldResults(fold).imNumsTrain = imNumsToUse(idxTrain);
-    results.foldResults(fold).imNumsTest = imNumsToUse(idxTest);
+    results.foldResults(fold).imNumsTrain = imNumsTrain;
+    results.foldResults(fold).imNumsTest = imNumsTest;
 
     predictions = predictResponses(imTest, results.foldResults(fold).params, modelfun);
     useThisMean = mean(betamnToUse);    
@@ -128,8 +130,8 @@ results.xvalr2 = mean([results.foldResults.r2test]);
 %% Concatenate the cross-validated results (and get a *useful* R2!)
 results.concatPredictions = zeros(length(betamnToUse));
 for fold = 1:nFolds
-    idxTest = folds{fold};
-    results.concatPredictions(idxTest) = results.foldResults(fold).predictions;
+    imNumsTest = foldImNums{fold};
+    results.concatPredictions(convertIndex(imNumsToUse, imNumsTest)) = results.foldResults(fold).predictions;
 end
 results.concatR2 = computeR2(results.concatPredictions, betamnToUse);
 
