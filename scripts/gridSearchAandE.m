@@ -14,26 +14,15 @@ v2Vox = find(strcmp(roilabels(roi), 'V2'));
 v3Vox = find(strcmp(roilabels(roi), 'V3'));
 
 betaSse = sum(betase, 2);
-[y,bestV1] = sort(betaSse(v1Vox));
-[y,bestV2] = sort(betaSse(v2Vox));
-[y,bestV3] = sort(betaSse(v3Vox));
+[y,bestV1idx] = sort(betaSse(v1Vox));
+[y,bestV2idx] = sort(betaSse(v2Vox));
+[y,bestV3idx] = sort(betaSse(v3Vox));
 
-v1VoxNums = bestV1(1:10);
-v2VoxNums = bestV2(1:10);
-v3VoxNums = bestV3(1:10);
-voxNums = [v1VoxNums; v2VoxNums; v3VoxNums]; % 30 voxels per brain
+v1VoxNums = v1Vox(bestV1idx(1:10));
+v2VoxNums = v2Vox(bestV2idx(1:10));
+v3VoxNums = v3Vox(bestV3idx(1:10));
+voxNums = [v1VoxNums, v2VoxNums, v3VoxNums]; % 30 voxels per brain
 
-% DATASET 3:
-% First 10, all three areas:
-% [170,88,72,28,42,74,144,27,138,146,105,104,157,47,84,55,216,129,220,19,185,158,179,163,165,175,137,189,110,161]
-% Next 10, all three areas:
-% [120,129,119,111,114,121,78,195,107,11,51,61,224,218,150,46,24,210,158,233,169,162,183,159,200,202,115,121,93,124]
-
-% DATASET 4:
-% First 10:
-% [76,38,65,109,81,16,80,61,66,15,20,53,136,50,21,54,51,80,66,146,46,217,101,14,82,204,202,100,90,130]
-% Next 10:
-% [57,52,64,63,39,48,58,85,138,35,17,55,117,34,86,118,123,56,110,83,40,149,43,185,146,187,42,10,210,45]
 
 voxNums = voxNum; % conversion to function
 display(['voxNum: ', num2str(voxNum)])

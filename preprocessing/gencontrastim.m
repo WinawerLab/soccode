@@ -38,7 +38,7 @@ for t = [0 0.001 0.1 1.0 10.0 100.0 1000.0] % zero is just a check
 end
 
 %% Visualize them
-ixs = arrayfun(@(x) find(imNumsToUse == x,1,'first'), [176:180, 181:184]);
+ixs = convertIndex(imNumsToUse, [176:180, 181:184]);
 show = [];
 for t = [NaN 0 0.001 0.1 1.0 10.0 100.0 1000.0]
     if isnan(t)

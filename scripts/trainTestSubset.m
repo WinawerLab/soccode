@@ -29,9 +29,9 @@ imIdxNat = arrayfun(@(idx) strInCellArray(stimuliNames{idx}, catNat), imNumsData
 imNumsNat = imNumsDataset(imIdxNat);
 
 %% Acquire corresponding betamn
-betamnIdxTrain = arrayfun(@(x) find(imNumsDataset == x,1,'first'), imNumsTrain);
-betamnIdxSparse = arrayfun(@(x) find(imNumsDataset == x,1,'first'), imNumsSparse);
-betamnIdxNat = arrayfun(@(x) find(imNumsDataset == x,1,'first'), imNumsNat);
+betamnIdxTrain = convertIndex(imNumsDataset, imNumsTrain);
+betamnIdxSparse = convertIndex(imNumsDataset, imNumsSparse);
+betamnIdxNat = convertIndex(imNumsDataset, imNumsNat);
 
 voxNum = 78; % a V1 voxel with good SNR
 betamnTrain = betamn(voxNum, betamnIdxTrain);
@@ -184,10 +184,10 @@ plot(predictions_full, 'ro')
 plot(predictions_omitnatkeepsparse, 'go')
 plot(predictions_omitnatomitsparse, 'co')
 
-sparsePlotIdx = arrayfun(@(x) find([imNumsTrain, imNumsSparse, imNumsNat] == x,1,'first'), imNumsSparse);
+sparsePlotIdx = convertIndex([imNumsTrain, imNumsSparse, imNumsNat], imNumsSparse);
 plot(sparsePlotIdx, zeros(length(sparsePlotIdx)), 'mx');
 
-natPlotIdx = arrayfun(@(x) find([imNumsTrain, imNumsSparse, imNumsNat] == x,1,'first'), imNumsNat);
+natPlotIdx = convertIndex([imNumsTrain, imNumsSparse, imNumsNat], imNumsNat);
 plot(natPlotIdx, zeros(length(natPlotIdx)), 'yx');
 
 legend('', 'Full', '+ sparse, - naturalistic', '- sparse, - naturalistic', 'sparse', 'naturalistic');

@@ -153,7 +153,7 @@ title('Better? Or worse?')
 dataloc = fullfile(rootpath, 'data', 'modelfits', '2015-05-05');
 voxNum = 9;
 datasetNum = 3;
-folder = ['vox', num2str(voxNum)];
+folder = ['subj', num2str(datasetNum), '-vox', num2str(voxNum)];
 
 filename = ['aegridsearch-a', num2str(aOld), '-e', num2str(eOld), '-subj', num2str(datasetNum), '.mat'];
 load(fullfile(dataloc, folder, filename));
@@ -263,6 +263,6 @@ modelfun = get_socmodel_original(90);
 
 
 folder = ['vox', num2str(findVoxel)];
-filename = ['aegridsearch-a', num2str(aOld), '-e', num2str(eOld), '-subj', num2str(datasetNum), '.mat'];
+filename = ['aegridsearch-a', num2str(aOld), '-e', num2str(eOld), '.mat'];
 load(fullfile(dataloc, folder, filename));
 oldPredictions = results.concatPredictions;

@@ -14,7 +14,7 @@ load(fullfile(rootpath, ['data/input/fmri_datasets/', dataset]),'betamn','betase
 
 imNumsDataset = 70:225;
 imNumsToUse = [70:173, 175:225]; % skip the category with only 7 frames
-betamnIdx = arrayfun(@(x) find(imNumsDataset == x,1,'first'), imNumsToUse);
+betamnIdx = convertIndex(imNumsDataset, imNumsToUse);
 
 %% Pick a demo voxel
 voxNum = 78; % a V1 voxel with good SNR

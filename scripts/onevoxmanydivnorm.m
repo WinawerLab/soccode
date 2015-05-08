@@ -24,7 +24,7 @@ load(fullfile(rootpath, 'code/visualization/stimuliNames.mat'), 'stimuliNames')
 addXlabels(imNumsToUse, stimuliNames);
 
 %% Extract the relevant voxel and images
-betamnIdx = arrayfun(@(x) find(imNumsDataset == x,1,'first'), imNumsToUse);
+betamnIdx = convertIndex(imNumsDataset, imNumsToUse);
 betamnToUse = betamn(voxNum, betamnIdx);
 
 %% Create a Kendrick-style socmodel

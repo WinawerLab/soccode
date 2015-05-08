@@ -60,7 +60,7 @@ load(fullfile(dataloc, folder, filename), 'results');
 %% Get new fits on old and new image sets
 dataloc = fullfile(rootpath, 'data', 'modelfits', '2015-05-07');
 
-fullDatasetIdx = arrayfun(@(x) find(results.imNumsDataset == x,1,'first'), preprocess.imNums);
+fullDatasetIdx = convertIndex(results.imNumsDataset, preprocess.imNums);
 
 redoFitFullSet = modelfittingContrastIm(modelfun, betamn(findVoxel, fullDatasetIdx), ...
     ancientIms);

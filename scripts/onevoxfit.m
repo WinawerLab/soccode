@@ -17,7 +17,7 @@ fh = setupBetaFig();
 bar(betamn(voxNum, :));
 
 %% Extract the relevant voxel and images
-betamnIdx = arrayfun(@(x) find(imNumsDataset == x,1,'first'), imNumsToUse);
+betamnIdx = convertIndex(imNumsDataset, imNumsToUse);
 betamnToUse = betamn(voxNum, betamnIdx);
 
 %% Load and resize raw images

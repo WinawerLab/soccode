@@ -25,7 +25,7 @@ catTrain = {'pattern_space', 'pattern_central', 'grating_ori', ...
 idxTrain = find(arrayfun(@(idx) strInCellArray(stimuliNames{idx}, catTrain), imNumsDataset));
 
 imNumsCat = [176, 177, 178,  179, 180, 181, 182, 183, 85, 184];
-idxCat = arrayfun(@(x) find(imNumsDataset == x,1,'first'), imNumsCat);
+idxCat = convertIndex(imNumsDataset, imNumsCat);
 
 dataset = ['dataset', num2str(datasetNum, '%02d'), '.mat'];
 load(fullfile(rootpath, ['data/input/fmri_datasets/', dataset]),'betamn','betase', 'roi', 'roilabels');
@@ -51,7 +51,7 @@ for voxIdx = 1:length(voxNums)
         continue;
     end
 
-    subIdxCat = arrayfun(@(x) find(idxTrain == x,1,'first'), idxCat);
+    subIdxCat = convertIndex(idxTrain, idxCat);
     
     predCat = results.concatPredictions(subIdxCat);
     useThisMean = mean(betamnTrain(voxIdx, :));

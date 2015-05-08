@@ -40,7 +40,7 @@ function [imNumsToUse, betamnToUse, voxNums] = loadDataset(n, whichVoxs)
     end
   
     % Extract the relevant voxel and images
-    betamnIdx = arrayfun(@(x) find(imNumsDataset == x,1,'first'), imNumsToUse);
+    betamnIdx = convertIndex(imNumsDataset, imNumsToUse);
     betamnToUse = betamn(voxNums, betamnIdx);
 
 end
