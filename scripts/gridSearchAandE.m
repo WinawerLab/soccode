@@ -69,11 +69,11 @@ end
 %% Set up the inputs and outputs for model fitting
 r = 1;
 s = 0.5;
-avals = 0; %[0, 0.5];
-evals = 1; %[1, 4];
-%avals = [0, 0.25, 0.5, 0.75, 1];
+%avals = 0; %[0, 0.5];
+%evals = 1; %[1, 4];
+avals = [0, 0.25, 0.5, 0.75, 1];
 %evals = [1, 2, 3, 4, 8, 12, 16];
-%evals = [1, 2, 4, 8, 16]; % This will be 4*5 + 1 = 21 combinations in the grid
+evals = [1, 2, 4, 8, 16]; % This will be 4*5 + 1 = 21 combinations in the grid
 
 inputdir = 'data/preprocessing/2015-03-11';
 outputdir = ['data/modelfits/', datestr(now,'yyyy-mm-dd'), '/vox', num2str(voxNum)];
