@@ -130,12 +130,13 @@ for a = avals
         end
         
         %% Concatenate the cross-validated results (and get a *useful* R2!)
-        results.concatPredictions = zeros(length(betamnToUse));
-        for fold = 1:nFolds
-            imNumsTest = foldImNums{fold};
-            results.concatPredictions(convertIndex(imNumsToUse, imNumsTest)) = results.foldResults(fold).predictions;
+        results.concatPredictions = zeros(1, length(results.betamnToUse));
+        for fold = 1:length(results.foldImNums)
+            imNumsTest = results.foldImNums{fold};
+            results.concatPredictions(convertIndex(results.imNumsToUse, imNumsTest)) = results.foldResults(fold).predictions;
         end
-        results.concatR2 = computeR2(results.concatPredictions, betamnToUse);
+        results.concatR2 = computeR2(results.concatPredictions, results.betamnToUse);
+        
         
         %% Here's another way that I hope computes the same thing
         accumSSres = 0;
