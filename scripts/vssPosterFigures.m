@@ -6,10 +6,6 @@
 % Loading the data!
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
-%%%%%%%%%%%% WARNING this all has bad indexing!! %%%%%%%%%%%%%%%%%%%%%%%%%%
-
 %% fMRI - which images
 imNumsDataset = 70:225;
 catToUse = {'pattern_space', 'pattern_central', 'grating_ori', ...
@@ -17,59 +13,198 @@ catToUse = {'pattern_space', 'pattern_central', 'grating_ori', ...
            'pattern_contrast', ... % skip naturalistic ...
            'grating_sparse', 'pattern_sparse'}; % skip noise space/halves
 
-% catToUse = {'pattern_space', 'pattern_central', 'grating_ori', ...
-%            'grating_contrast', 'plaid_contrast', 'circular_contrast', ...
-%            'pattern_contrast', 'non_geometric_small', 'scenes', ...
-%            'grating_sparse', 'pattern_sparse', 'noise_space', 'noise_grating_halves'};
-
 load(fullfile(rootpath, 'code', 'visualization', 'stimuliNames.mat'), 'stimuliNames');
        
 imIdxToUse = arrayfun(@(idx) strInCellArray(stimuliNames{idx}, catToUse), imNumsDataset);
 imNumsToUse = imNumsDataset(imIdxToUse);
 
 %% fMRI - betamn, both datasets
-datasetNums = [3, 4];
+betaIdxToUse = convertIndex(imNumsDataset, imNumsToUse);
 
-datasets = {};
-for ii = 1:length(datasetNums)
-    dataset = ['dataset', num2str(datasetNums(ii), '%02d'), '.mat'];
-    load(fullfile(rootpath, ['data/input/fmri_datasets/', dataset]),'betamn','betase', 'roi', 'roilabels');
-    
-    betaIdxToUse = arrayfun(@(x) find(imNumsDataset == x,1,'first'), imNumsToUse);
-    betamnToUse = betamn(:, betaIdxToUse);
-    betaseToUse = betase(:, betaIdxToUse);
-    
-    datasets{ii}.vals = betamnToUse;
-    datasets{ii}.errs = betaseToUse;
-    datasets{ii}.roi = roi;
-    datasets{ii}.roilabels = roilabels;
-end
+datasetNum = 3;
+dataset = ['dataset', num2str(datasetNum, '%02d'), '.mat'];
+load(fullfile(rootpath, ['data/input/fmri_datasets/', dataset]),'betamn','betase', 'roi', 'roilabels');
+betamnToUse_3 = betamn(:, betaIdxToUse);
+betaseToUse_3 = betase(:, betaIdxToUse);
+betamn_3 = betamn;
+betase_3 = betase;
+roi_3 = roi;
+roilabels_3 = roilabels;
+
+datasetNum = 4;
+dataset = ['dataset', num2str(datasetNum, '%02d'), '.mat'];
+load(fullfile(rootpath, ['data/input/fmri_datasets/', dataset]),'betamn','betase', 'roi', 'roilabels');
+betamn_4 = betamn;
+betase_4 = betase;
+betamnToUse_4 = betamn(:, betaIdxToUse);
+betaseToUse_4 = betase(:, betaIdxToUse);
+roi_4 = roi;
+roilabels_4 = roilabels;
+
+clear('betamn', 'betase', 'roi', 'roilabels')
+
+%% Which voxels are of interest:
+% DATASET 3
+v1Vox_3 = find(strcmp(roilabels_3(roi_3), 'V1'));
+v2Vox_3 = find(strcmp(roilabels_3(roi_3), 'V2'));
+v3Vox_3 = find(strcmp(roilabels_3(roi_3), 'V3'));
+
+betaSse_3 = sum(betase_3, 2);
+[y,bestV1idx_3] = sort(betaSse_3(v1Vox_3));
+[y,bestV2idx_3] = sort(betaSse_3(v2Vox_3));
+[y,bestV3idx_3] = sort(betaSse_3(v3Vox_3));
+
+% Subj 3 batch 1:
+v1VoxNums1_3 = v1Vox_3(bestV1idx_3(1:10));
+v2VoxNums1_3 = v2Vox_3(bestV2idx_3(1:10));
+v3VoxNums1_3 = v3Vox_3(bestV3idx_3(1:10));
+% [509,198,181,83,97,183,353,82,339,359,367,366,518,210,310,227,779,459,786,111,959,851,953,859,861,949,781,965,694,856];
+
+% Subj 3 batch 2 - NOT RUN GRIDSEARCH YET as of 5/8
+v1VoxNums2_3 = v1Vox_3(bestV1idx_3(11:20));
+v2VoxNums2_3 = v2Vox_3(bestV2idx_3(11:20));
+v3VoxNums2_3 = v3Vox_3(bestV3idx_3(11:20));
+% [318,327,317,302,308,319,188,834,297,40,221,239,791,784,499,206,118,668,585,801,917,857,957,852,1043,1045,701,756,669,761];
+
+% DATASET 4
+v1Vox_4 = find(strcmp(roilabels_4(roi_4), 'V1'));
+v2Vox_4 = find(strcmp(roilabels_4(roi_4), 'V2'));
+v3Vox_4 = find(strcmp(roilabels_4(roi_4), 'V3'));
+
+betaSse_4 = sum(betase_4, 2);
+[y,bestV1idx_4] = sort(betaSse_4(v1Vox_4));
+[y,bestV2idx_4] = sort(betaSse_4(v2Vox_4));
+[y,bestV3idx_4] = sort(betaSse_4(v3Vox_4));
+
+% Subj 4 batch 1:
+v1VoxNums1_4 = v1Vox_4(bestV1idx_4(1:10));
+v2VoxNums1_4 = v2Vox_4(bestV2idx_4(1:10));
+v3VoxNums1_4 = v3Vox_4(bestV3idx_4(1:10));
+% [167,44,100,308,172,17,171,84,101,16,94,200,619,190,105,204,191,309,274,746,205,954,390,106,315,797,795,389,327,482];
+
+% Subj 4 batch 2:
+v1VoxNums2_4 = v1Vox_4(bestV1idx_4(11:20));
+v2VoxNums2_4 = v2Vox_4(bestV2idx_4(11:20));
+v3VoxNums2_4 = v3Vox_4(bestV3idx_4(11:20));
+% [77,71,92,86,58,67,78,179,469,40,90,243,472,152,322,473,566,254,457,314,196,567,201,747,561,754,198,99,924,203];
 
 %% ECoG - which images
 load(fullfile(rootpath, 'code', 'visualization', 'stimuliNamesEcog.mat'), 'stimuliNamesEcog');
 imIdxToUseEcog = find(arrayfun(@(idx) strInCellArray(stimuliNamesEcog{idx}, catToUse), 1:length(stimuliNamesEcog)));
 
 %% ECoG - electrode data, one dataset
-datasets{3}.electrodes = [108 109 115 120 121 107];
+electrodes = [108 109 115 120 121 107];
 
-[ecog_vals, ecog_errs] = loadEcogBroadband(datasets{3}.electrodes);
-datasets{3}.vals = ecog_vals(:, imIdxToUseEcog);
-datasets{3}.errs = ecog_errs(:, imIdxToUseEcog, :);
-
+[ecog_vals, ecog_errs] = loadEcogBroadband(electrodes);
+ecogValsToUse = ecog_vals(:, imIdxToUseEcog);
+ecogErrsToUse = ecog_errs(:, imIdxToUseEcog, :);
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Plotting empirical data
+% Red bars, blue bars - data!
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-setupBetaFig;
-bar(datasets{1}.vals(1, :));
-addXlabels(imNumsToUse, stimuliNames);
+imNumsCat = [176, 177, 178, 179, 180, 181, 182, 183, 85, 184];
 
-setupBetaFig;
-bar(datasets{3}.vals(1, :));
-addXlabels(imIdxToUseEcog, stimuliNamesEcog);
+% DATASET 3
+voxels = betamnToUse_3([v1VoxNums1_3, v1VoxNums2_3], convertIndex(imNumsToUse, imNumsCat));
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+ylim([-0.5, 2]);
+title('Dataset 3, V1 voxel data')
 
+voxels = betamnToUse_3([v2VoxNums1_3, v2VoxNums2_3], convertIndex(imNumsToUse, imNumsCat));
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+ylim([-0.5, 2]);
+title('Dataset 3, V2 voxel data')
+
+voxels = betamnToUse_3([v3VoxNums1_3, v3VoxNums2_3], convertIndex(imNumsToUse, imNumsCat));
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+ylim([-0.5, 2]);
+title('Dataset 3, V3 voxel data')
+
+voxels = betamnToUse_3([v1VoxNums1_3, v1VoxNums2_3, v2VoxNums1_3, v2VoxNums2_3, v3VoxNums1_3, v3VoxNums2_3], convertIndex(imNumsToUse, imNumsCat));
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+ylim([-0.5, 2]);
+title('Dataset 3, V1+V2+V3 voxel data')
+
+% DATASET 4
+voxels = betamnToUse_4([v1VoxNums1_4, v1VoxNums2_4], convertIndex(imNumsToUse, imNumsCat));
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+ylim([-0.5, 2]);
+title('Dataset 4, V1 voxel data')
+
+voxels = betamnToUse_4([v2VoxNums1_4, v2VoxNums2_4], convertIndex(imNumsToUse, imNumsCat));
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+ylim([-0.5, 2]);
+title('Dataset 4, V2 voxel data')
+
+voxels = betamnToUse_4([v3VoxNums1_4, v3VoxNums2_4], convertIndex(imNumsToUse, imNumsCat));
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+ylim([-0.5, 2]);
+title('Dataset 4, V3 voxel data')
+
+voxels = betamnToUse_4([v1VoxNums1_4, v1VoxNums2_4, v2VoxNums1_4, v2VoxNums2_4, v3VoxNums1_4, v3VoxNums2_4], convertIndex(imNumsToUse, imNumsCat));
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+ylim([-0.5, 2]);
+title('Dataset 3, V1+V2+V3 voxel data')
+
+%% ECOG
+imIdxCatEcog = [69, 70, 71, 72, 73, 74, 75, 76, 77, 78];
+channels = ecogValsToUse(:, convertIndex(imIdxToUseEcog, imIdxCatEcog));
+figure; hold on;
+bar([mean(channels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(channels(:, 6:10), 1)], 'b');
+ylim([0, 1]);
+title('ECoG data, all channels')
+
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Red bars, blue bars - predictions!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+aOld = 0;
+eOld = 1;
+
+aNew = 0.75;
+eNew = 8;
+
+dataloc = fullfile(rootpath, 'data', 'modelfits', '2015-05-08');
+
+datasetNum = 3;
+voxNums = [v1VoxNums1_3, v2VoxNums1_3, v3VoxNums1_3];
+predictionsOld1_3 = zeros(length(voxNums), size(betamnToUse_3, 2));
+predictionsNew1_3 = zeros(length(voxNums), size(betamnToUse_3, 2));
+
+for voxIdx = 1:length(voxNums)
+    voxNum = voxNums(voxIdx);
+    folder = ['subj', num2str(datasetNum), '-vox', num2str(voxNum)];
+
+    filename = ['aegridsearch-a', num2str(aOld), '-e', num2str(eOld), '-subj', num2str(datasetNum), '.mat'];
+    load(fullfile(dataloc, folder, filename), 'results');    
+    predictionsOld1_3(voxIdx, :) = results.concatPredictions;
+    
+    filename = ['aegridsearch-a', num2str(aNew), '-e', num2str(eNew), '-subj', num2str(datasetNum), '.mat'];
+    load(fullfile(dataloc, folder, filename), 'results');    
+    predictionsNew1_3(voxIdx, :) = results.concatPredictions;
+end
+
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Actual images
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -79,7 +214,7 @@ addXlabels(imIdxToUseEcog, stimuliNamesEcog);
 ims = load(fullfile(rootpath, 'data', 'input', 'ecog_datasets', 'socforecog.mat'));
 
 figure;
-for ii = 1:size(ims.stimuli, 3)
+for ii = 69:78
     imshow(ims.stimuli(:,:,ii));
     title(ii);
     pause(0.5);
@@ -94,7 +229,7 @@ aOld = 0;
 eOld = 1;
 
 aNew = 0.5;
-eNew = 4;
+eNew = 8;
 
 % avals = [0.25, 0.5, 0.75, 1];
 % evals = [1, 2, 4, 8, 16]; 
@@ -102,9 +237,57 @@ eNew = 4;
 % for aNew = avals
 %     for eNew = evals
 
-categoryR2sOld = processGridSearchCategory(aOld, eOld);
-categoryR2sNew = processGridSearchCategory(aNew, eNew);
+[categoryR2sOld, categoryPredictionsOld] = processGridSearchCategory(aOld, eOld, 3, voxNums3_1);
+[categoryR2sNew, categoryPredictionsNew] = processGridSearchCategory(aNew, eNew, 3, voxNums3_1);
 
+catMeansOld = mean(categoryPredictionsOld, 2);
+catMeansNew = mean(categoryPredictionsNew, 2);
+
+figure; hold on;
+plot([catMeansOld(1:5); zeros(5,1)], 'ro-');
+plot([zeros(5,1); catMeansOld(6:10)], 'bo-');
+
+plot([catMeansNew(1:5); zeros(5,1)], 'mo-');
+plot([zeros(5,1); catMeansNew(6:10)], 'co-');
+title('Old vs. new avg');
+
+% V1
+catMeansOldV1 = mean(categoryPredictionsOld(:, 1:10), 2);
+catMeansNewV1 = mean(categoryPredictionsNew(:, 1:10), 2);
+
+figure; hold on;
+plot([catMeansOldV1(1:5); zeros(5,1)], 'ro-');
+plot([zeros(5,1); catMeansOldV1(6:10)], 'bo-');
+
+plot([catMeansNewV1(1:5); zeros(5,1)], 'mo-');
+plot([zeros(5,1); catMeansNewV1(6:10)], 'co-');
+title('Old vs. new avg, V1 only');
+
+% V2
+catMeansOldV2 = mean(categoryPredictionsOld(:, 11:20), 2);
+catMeansNewV2 = mean(categoryPredictionsNew(:, 11:20), 2);
+
+figure; hold on;
+plot([catMeansOldV2(1:5); zeros(5,1)], 'ro-');
+plot([zeros(5,1); catMeansOldV2(6:10)], 'bo-');
+
+plot([catMeansNewV2(1:5); zeros(5,1)], 'mo-');
+plot([zeros(5,1); catMeansNewV2(6:10)], 'co-');
+title('Old vs. new avg, V2 only');
+
+% V3
+catMeansOldV3 = mean(categoryPredictionsOld(:, 21:30), 2);
+catMeansNewV3 = mean(categoryPredictionsNew(:, 21:30), 2);
+
+figure; hold on;
+plot([catMeansOldV1(1:5); zeros(5,1)], 'ro-');
+plot([zeros(5,1); catMeansOldV1(6:10)], 'bo-');
+
+plot([catMeansNewV3(1:5); zeros(5,1)], 'mo-');
+plot([zeros(5,1); catMeansNewV3(6:10)], 'co-');
+title('Old vs. new avg, V3 only');
+
+%%
 figure; hold on;
 unityline = linspace(0, 1, 100);
 plot(unityline, unityline, 'k-');
@@ -116,13 +299,21 @@ title(['Category-specific R^2 ', num2str(aNew), ' ', num2str(eNew)]);
 %     end
 % end
 
+
+%% Predictions difference
+avgDiff = mean(categoryPredictionsNew - categoryPredictionsOld, 2);
+figure; hold on;
+bar([avgDiff(1:5); zeros(5,1)], 'r');
+bar([zeros(5,1); avgDiff(6:10)], 'b');
+
+
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Residuals
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-oldResiduals = processGridSearchResiduals(aOld, eOld);
-newResiduals = processGridSearchResiduals(aNew, eNew);
+oldResiduals = processGridSearchResiduals(aOld, eOld, 3, voxNums3_1);
+newResiduals = processGridSearchResiduals(aNew, eNew, 3, voxNums3_1);
 
 setupBetaFig;
 bar(nanmean(oldResiduals, 2));
@@ -150,8 +341,8 @@ title('Better? Or worse?')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Plot cross-validated predictions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-dataloc = fullfile(rootpath, 'data', 'modelfits', '2015-05-05');
-voxNum = 9;
+dataloc = fullfile(rootpath, 'data', 'modelfits', '2015-05-07');
+voxNum = 198;
 datasetNum = 3;
 folder = ['subj', num2str(datasetNum), '-vox', num2str(voxNum)];
 
@@ -164,9 +355,9 @@ load(fullfile(dataloc, folder, filename));
 newPredictions = results.concatPredictions;
 
 setupBetaFig;
-bar(datasets{1}.vals(voxNum, :));
-% plot(oldPredictions, 'ro');
-% plot(newPredictions, 'go');
+bar(results.betamnToUse);
+plot(oldPredictions, 'ro-');
+plot(newPredictions, 'go-');
 addXlabels(imNumsToUse, stimuliNames);
 
 %%
