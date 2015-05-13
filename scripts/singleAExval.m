@@ -3,11 +3,10 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function singleAExval(voxNum, a, e, nFolds)
+function singleAExval(datasetNum, voxNum, a, e, nFolds)
 % nFolds can be a number, or 'leaveoneout'
 
 %% Dataset
-datasetNum = 3;
 dataset = ['dataset', num2str(datasetNum, '%02d'), '.mat'];
 load(fullfile(rootpath, ['data/input/fmri_datasets/', dataset]),'betamn','betase', 'roi', 'roilabels');
 
@@ -128,7 +127,7 @@ end
 results.xvalr2 = mean([results.foldResults.r2test]);
 
 %% Concatenate the cross-validated results (and get a *useful* R2!)
-results.concatPredictions = zeros(length(betamnToUse));
+results.concatPredictions = zeros(1, length(betamnToUse));
 for fold = 1:nFolds
     imNumsTest = foldImNums{fold};
     results.concatPredictions(convertIndex(imNumsToUse, imNumsTest)) = results.foldResults(fold).predictions;

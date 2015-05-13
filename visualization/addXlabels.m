@@ -1,4 +1,4 @@
-function xlabels = addXlabels(imNums, stimuliNames)
+function xlabels = addXlabels(imNums, stimuliNames, rotate)
 %GEN X LABELS - Generate X-axis labels based on stimuli names and indices
 %
 %   Adds labels to the x axis, based on the names of the categories as
@@ -17,6 +17,12 @@ function xlabels = addXlabels(imNums, stimuliNames)
     
     xlabels = stimuliNames(imNums); % take only the ones currently in use
     
+    if ~exist('rotate', 'var')
+        rotate = true;
+    else
+        rotate = false;
+    end
+    
     curr = '';
     for i = 1:length(xlabels)
         if ~strcmp(xlabels{i}, curr)
@@ -28,7 +34,9 @@ function xlabels = addXlabels(imNums, stimuliNames)
     end
     xlabels = strrep(xlabels, '_', '\_');
     set(gca,'XTick', 1:length(xlabels), 'XTickLabel', xlabels);
-    xticklabel_rotate([], 90);
+    if rotate
+        xticklabel_rotate([], 90);
+    end
     xlabel('Stimulus category');
 end
 

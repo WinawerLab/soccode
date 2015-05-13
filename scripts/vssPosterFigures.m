@@ -6,6 +6,12 @@
 % Loading the data!
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%% Create figs directory
+figDir = fullfile(rootpath, 'figs', datestr(now,'yyyy-mm-dd'));
+if ~exist(figDir, 'dir')
+    mkdir(figDir);
+end
+
 %% fMRI - which images
 imNumsDataset = 70:225;
 catToUse = {'pattern_space', 'pattern_central', 'grating_ori', ...
@@ -101,10 +107,66 @@ ecogErrsToUse = ecog_errs(:, imIdxToUseEcog, :);
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Red bars, blue bars - data!
+% Example voxel
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+exV1idx = 7; % aka 353
+
+setupBetaFig;
+bar(betamnToUse_3(v1VoxNums1_3(exV1idx), :));
+addXlabels(imNumsToUse, stimuliNames);
+
+% TODO: no, should be leaveoneout!!
+load(fullfile(rootpath, 'data', 'modelfits', '2015-05-12', 'subj3-vox353', 'xval-a0-e1-subj3-nfolds10.mat'), 'results');
+plot(results.concatPredictions(1:108), 'g.-');
+
+hgexport(gcf,fullfile(figDir, ['bars_exampleV1vox_data.eps']));
+
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Images out to EPS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 imNumsCat = [176, 177, 178, 179, 180, 181, 182, 183, 85, 184];
+imStackCat = loadImages(fullfile(rootpath, 'data', 'input', 'stimuli.mat'), imNumsCat);
+
+%%
+figure;
+for ii = 1:length(imNumsCat)
+    for f = 1:9
+        imshow(imStackCat(:, :, ii, f), [0, 255]);
+        hgexport(gcf,fullfile(figDir, ['im_', num2str(imNumsCat(ii)), '_frame_', num2str(f), '.eps']));
+    end
+end
+
+%%
+load(fullfile(rootpath, 'data', 'input', 'stimuli_2015_04_06.mat'), 'stimuli');
+figure;
+for ii = 1:size(stimuli.imStack, 3)
+    for f = 1:size(stimuli.imStack, 4)
+        disp(ii)
+        disp(f)
+        imshow(stimuli.imStack(:, :, ii, f), [0, 255]);
+        hgexport(gcf,fullfile(figDir, ['imApr_', num2str(ii), '_frame_', num2str(f), '.eps']));
+    end
+end
+
+%%
+load(fullfile(rootpath, 'data', 'input', 'stimuli_2015_04_06.mat'), 'stimuli');
+figure;
+for ii = 1:size(stimuli.imStack, 3)
+    for f = 1:size(stimuli.imStack, 4)
+        disp(ii)
+        disp(f)
+        imshow(stimuli.imStack(300:500, 300:500, ii, f), [0, 255]);
+        hgexport(gcf,fullfile(figDir, ['thumbApr_', num2str(ii), '_frame_', num2str(f), '.eps']));
+    end
+end
+
+
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Red bars, blue bars - data!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % DATASET 3
 voxels = betamnToUse_3([v1VoxNums1_3, v1VoxNums2_3], convertIndex(imNumsToUse, imNumsCat));
@@ -113,6 +175,8 @@ bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
 bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
 ylim([-0.5, 2]);
 title('Dataset 3, V1 voxel data')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_data_subj3_V1.eps'));
 
 voxels = betamnToUse_3([v2VoxNums1_3, v2VoxNums2_3], convertIndex(imNumsToUse, imNumsCat));
 figure; hold on;
@@ -120,6 +184,8 @@ bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
 bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
 ylim([-0.5, 2]);
 title('Dataset 3, V2 voxel data')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_data_subj3_V2.eps'));
 
 voxels = betamnToUse_3([v3VoxNums1_3, v3VoxNums2_3], convertIndex(imNumsToUse, imNumsCat));
 figure; hold on;
@@ -127,6 +193,8 @@ bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
 bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
 ylim([-0.5, 2]);
 title('Dataset 3, V3 voxel data')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_data_subj3_V3.eps'));
 
 voxels = betamnToUse_3([v1VoxNums1_3, v1VoxNums2_3, v2VoxNums1_3, v2VoxNums2_3, v3VoxNums1_3, v3VoxNums2_3], convertIndex(imNumsToUse, imNumsCat));
 figure; hold on;
@@ -134,14 +202,18 @@ bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
 bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
 ylim([-0.5, 2]);
 title('Dataset 3, V1+V2+V3 voxel data')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_data_subj3_V123.eps'));
 
-% DATASET 4
+%% DATASET 4
 voxels = betamnToUse_4([v1VoxNums1_4, v1VoxNums2_4], convertIndex(imNumsToUse, imNumsCat));
 figure; hold on;
 bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
 bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
 ylim([-0.5, 2]);
 title('Dataset 4, V1 voxel data')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_data_subj4_V1.eps'));
 
 voxels = betamnToUse_4([v2VoxNums1_4, v2VoxNums2_4], convertIndex(imNumsToUse, imNumsCat));
 figure; hold on;
@@ -149,6 +221,8 @@ bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
 bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
 ylim([-0.5, 2]);
 title('Dataset 4, V2 voxel data')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_data_subj4_V2.eps'));
 
 voxels = betamnToUse_4([v3VoxNums1_4, v3VoxNums2_4], convertIndex(imNumsToUse, imNumsCat));
 figure; hold on;
@@ -156,13 +230,17 @@ bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
 bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
 ylim([-0.5, 2]);
 title('Dataset 4, V3 voxel data')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_data_subj4_V3.eps'));
 
 voxels = betamnToUse_4([v1VoxNums1_4, v1VoxNums2_4, v2VoxNums1_4, v2VoxNums2_4, v3VoxNums1_4, v3VoxNums2_4], convertIndex(imNumsToUse, imNumsCat));
 figure; hold on;
 bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
 bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
 ylim([-0.5, 2]);
-title('Dataset 3, V1+V2+V3 voxel data')
+title('Dataset 4, V1+V2+V3 voxel data')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_data_subj4_V123.eps'));
 
 %% ECOG
 imIdxCatEcog = [69, 70, 71, 72, 73, 74, 75, 76, 77, 78];
@@ -172,6 +250,8 @@ bar([mean(channels(:, 1:5), 1), zeros(1, 5)], 'r');
 bar([zeros(1,5), mean(channels(:, 6:10), 1)], 'b');
 ylim([0, 1]);
 title('ECoG data, all channels')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_data_ecog_allchannels.eps'));
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -186,6 +266,8 @@ eNew = 8;
 
 dataloc = fullfile(rootpath, 'data', 'modelfits', '2015-05-08');
 
+
+%% Dataset 3!
 datasetNum = 3;
 voxNums = [v1VoxNums1_3, v2VoxNums1_3, v3VoxNums1_3];
 predictionsOld1_3 = zeros(length(voxNums), size(betamnToUse_3, 2));
@@ -204,6 +286,387 @@ for voxIdx = 1:length(voxNums)
     predictionsNew1_3(voxIdx, :) = results.concatPredictions;
 end
 
+
+voxels = predictionsOld1_3(1:10, convertIndex(imNumsToUse, imNumsCat));
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+ylim([-0.5, 2]);
+title('Dataset 3, V1 voxel OLD predictions')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_SOCpred_subj3_V1.eps'));
+
+voxels = predictionsOld1_3(11:20, convertIndex(imNumsToUse, imNumsCat));
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+ylim([-0.5, 2]);
+title('Dataset 3, V2 voxel OLD predictions')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_SOCpred_subj3_V2.eps'));
+
+voxels = predictionsOld1_3(21:30, convertIndex(imNumsToUse, imNumsCat));
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+ylim([-0.5, 2]);
+title('Dataset 3, V3 voxel OLD predictions')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_SOCpred_subj3_V3.eps'));
+
+voxels = predictionsOld1_3(:, convertIndex(imNumsToUse, imNumsCat));
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+ylim([-0.5, 2]);
+title('Dataset 3, V1+V2+V3 voxel OLD predictions')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_SOCpred_subj3_V123.eps'));
+
+voxels = predictionsNew1_3(1:10, convertIndex(imNumsToUse, imNumsCat));
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+ylim([-0.5, 2]);
+title('Dataset 3, V1 voxel NEW predictions')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_OTSpred_subj3_V1.eps'));
+
+voxels = predictionsNew1_3(11:20, convertIndex(imNumsToUse, imNumsCat));
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+ylim([-0.5, 2]);
+title('Dataset 3, V2 voxel NEW predictions')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_OTSpred_subj3_V2.eps'));
+
+voxels = predictionsNew1_3(21:30, convertIndex(imNumsToUse, imNumsCat));
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+ylim([-0.5, 2]);
+title('Dataset 3, V3 voxel NEW predictions')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_OTSpred_subj3_V3.eps'));
+
+voxels = predictionsNew1_3(:, convertIndex(imNumsToUse, imNumsCat));
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+ylim([-0.5, 2]);
+title('Dataset 3, V1+V2+V3 voxel NEW predictions')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_OTSpred_subj3_V123.eps'));
+
+%% DATASET 4!
+
+datasetNum = 4;
+voxNums = [v1VoxNums1_4, v2VoxNums1_4, v3VoxNums1_4];
+predictionsOld1_4 = zeros(length(voxNums), size(betamnToUse_4, 2));
+predictionsNew1_4 = zeros(length(voxNums), size(betamnToUse_4, 2));
+
+for voxIdx = 1:length(voxNums)
+    voxNum = voxNums(voxIdx);  
+    folder = ['subj', num2str(datasetNum), '-vox', num2str(voxNum)];
+
+    try
+    filename = ['aegridsearch-a', num2str(aOld), '-e', num2str(eOld), '-subj', num2str(datasetNum), '.mat'];
+    load(fullfile(dataloc, folder, filename), 'results');    
+    predictionsOld1_4(voxIdx, :) = results.concatPredictions;
+    
+    filename = ['aegridsearch-a', num2str(aNew), '-e', num2str(eNew), '-subj', num2str(datasetNum), '.mat'];
+    load(fullfile(dataloc, folder, filename), 'results');    
+    predictionsNew1_4(voxIdx, :) = results.concatPredictions;
+    catch
+        disp('oops, one of the files was not found')
+    end
+end
+
+voxels = predictionsOld1_4(1:10, convertIndex(imNumsToUse, imNumsCat));
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+ylim([-0.5, 2]);
+title('Dataset 4, V1 voxel OLD predictions')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_SOCpred_subj4_V1.eps'));
+
+voxels = predictionsOld1_4(11:20, convertIndex(imNumsToUse, imNumsCat));
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+ylim([-0.5, 2]);
+title('Dataset 4, V2 voxel OLD predictions')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_SOCpred_subj4_V2.eps'));
+
+voxels = predictionsOld1_4(21:30, convertIndex(imNumsToUse, imNumsCat));
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+ylim([-0.5, 2]);
+title('Dataset 4, V3 voxel OLD predictions')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_SOCpred_subj4_V3.eps'));
+
+voxels = predictionsOld1_4(:, convertIndex(imNumsToUse, imNumsCat));
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+ylim([-0.5, 2]);
+title('Dataset 4, V1+V2+V3 voxel OLD predictions')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_SOCpred_subj4_V123.eps'));
+
+voxels = predictionsNew1_4(1:10, convertIndex(imNumsToUse, imNumsCat));
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+ylim([-0.5, 2]);
+title('Dataset 4, V1 voxel NEW predictions')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_OTSpred_subj4_V1.eps'));
+
+voxels = predictionsNew1_4(11:20, convertIndex(imNumsToUse, imNumsCat));
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+ylim([-0.5, 2]);
+title('Dataset 4, V2 voxel NEW predictions')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_OTSpred_subj4_V2.eps'));
+
+voxels = predictionsNew1_4(21:30, convertIndex(imNumsToUse, imNumsCat));
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+ylim([-0.5, 2]);
+title('Dataset 4, V3 voxel NEW predictions')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_OTSpred_subj4_V3.eps'));
+
+voxels = predictionsNew1_4(:, convertIndex(imNumsToUse, imNumsCat));
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+ylim([-0.5, 2]);
+title('Dataset 4, V1+V2+V3 voxel NEW predictions')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_OTSpred_subj4_V123.eps'));
+
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Every-image summary of real, predictions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Dataset 3
+setupBetaFig;
+bar(mean(betamnToUse_3(v1VoxNums1_3, :), 1));
+plot(mean(predictionsOld1_3(1:10, :), 1), 'ro');
+plot(mean(predictionsNew1_3(1:10, :), 1), 'go');
+addXlabels(imNumsToUse, stimuliNames, false);
+title('V1, dataset 3')
+legend('Data', 'Old model', 'New model')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'bar_dataVsModel_subj3_V1.eps'));
+
+setupBetaFig;
+bar(mean(betamnToUse_3(v2VoxNums1_3, :), 1));
+plot(mean(predictionsOld1_3(11:20, :), 1), 'ro');
+plot(mean(predictionsNew1_3(11:20, :), 1), 'go');
+addXlabels(imNumsToUse, stimuliNames);
+title('V2, dataset 3')
+legend('Data', 'Old model', 'New model')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'bar_dataVsModel_subj3_V2.eps'));
+
+setupBetaFig;
+bar(mean(betamnToUse_3(v3VoxNums1_3, :), 1));
+plot(mean(predictionsOld1_3(21:30, :), 1), 'ro');
+plot(mean(predictionsNew1_3(21:30, :), 1), 'go');
+addXlabels(imNumsToUse, stimuliNames);
+title('V3, dataset 3')
+legend('Data', 'Old model', 'New model')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'bar_dataVsModel_subj3_V3.eps'));
+
+%% Dataset 4
+setupBetaFig;
+bar(mean(betamnToUse_4(v1VoxNums1_4, :), 1));
+plot(mean(predictionsOld1_4(1:10, :), 1), 'ro');
+plot(mean(predictionsNew1_4(1:10, :), 1), 'go');
+addXlabels(imNumsToUse, stimuliNames);
+title('V1, dataset 4')
+legend('Data', 'Old model', 'New model')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'bar_dataVsModel_subj4_V1.eps'));
+
+setupBetaFig;
+bar(mean(betamnToUse_4(v2VoxNums1_4, :), 1));
+plot(mean(predictionsOld1_4(11:20, :), 1), 'ro');
+plot(mean(predictionsNew1_4(11:20, :), 1), 'go');
+addXlabels(imNumsToUse, stimuliNames);
+title('V2, dataset 4')
+legend('Data', 'Old model', 'New model')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'bar_dataVsModel_subj4_V2.eps'));
+
+setupBetaFig;
+bar(mean(betamnToUse_4(v3VoxNums1_4, :), 1));
+plot(mean(predictionsOld1_4(21:30, :), 1), 'ro');
+plot(mean(predictionsNew1_4(21:30, :), 1), 'go');
+addXlabels(imNumsToUse, stimuliNames);
+title('V3, dataset 4')
+legend('Data', 'Old model', 'New model')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'bar_dataVsModel_subj4_V3.eps'));
+
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% New stimuli! Woo! 2015-04-06
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+r = 1;
+s = 0.5;
+inputDir = fullfile('data', 'preprocessing', '2015-05-09');
+
+inputFile = ['newstimuli_r', strrep(num2str(r), '.', 'pt'),...
+                    '_s', strrep(num2str(s), '.', 'pt'),...
+                    '_a', strrep(num2str(aOld), '.', 'pt'),...
+                    '_e', strrep(num2str(eOld), '.', 'pt'), '.mat'];
+load(fullfile(rootpath, inputDir, inputFile), 'preprocess');
+
+imStack = flatToStack(preprocess.contrast, 9);
+imPxv = stackToPxv(imStack);
+imToUse = permute(imPxv, [2 1 3]);
+
+modelfun = get_socmodel_original(90);
+
+
+% Reuse the old model fits for the new predictions
+datasetNum = 4;
+voxNums = [v1VoxNums1_4, v2VoxNums1_4, v3VoxNums1_4];
+predictionsAprOld1_4 = NaN*ones(length(voxNums), size(imToUse, 1));
+predictionsAprNew1_4 = NaN*ones(length(voxNums), size(imToUse, 1));
+
+for voxIdx = 1:length(voxNums)
+    voxNum = voxNums(voxIdx);  
+    folder = ['subj', num2str(datasetNum), '-vox', num2str(voxNum)];
+
+    % Old
+    try
+        filename = ['aegridsearch-a', num2str(aOld), '-e', num2str(eOld), '-subj', num2str(datasetNum), '.mat'];
+        load(fullfile(dataloc, folder, filename), 'results');
+    catch
+        disp('oops, one of the files was not found')
+        continue;
+    end
+    
+    predictions = zeros(length(results.foldImNums), size(imToUse, 1));    
+    for fold = 1:length(results.foldImNums)
+        params = results.foldResults(fold).params;
+        predictions(fold, :) = predictResponses(imToUse, params, modelfun);
+    end
+    predictionsAprOld1_4(voxIdx, :) = mean(predictions, 1);
+    
+    % New
+    try
+        filename = ['aegridsearch-a', num2str(aNew), '-e', num2str(eNew), '-subj', num2str(datasetNum), '.mat'];
+        load(fullfile(dataloc, folder, filename), 'results');
+    catch
+        disp('oops, one of the files was not found')
+        continue;
+    end
+    
+    predictions = zeros(length(results.foldImNums), size(imToUse, 1));    
+    for fold = 1:length(results.foldImNums)
+        params = results.foldResults(fold).params;
+        predictions(fold, :) = predictResponses(imToUse, params, modelfun);
+    end
+    predictionsAprNew1_4(voxIdx, :) = mean(predictions, 1);
+end
+
+%% Plot the predictions - NEW model
+figure; hold on;
+bar([nanmean(predictionsAprNew1_4(1:10, 1:3), 1), zeros(1, 9)], 'b');
+bar([zeros(1,3), nanmean(predictionsAprNew1_4(1:10, 4:6), 1), zeros(1,6)], 'g');
+bar([zeros(1,6), nanmean(predictionsAprNew1_4(1:10, 7:9), 1), zeros(1,3)], 'r');
+bar([zeros(1,9), nanmean(predictionsAprNew1_4(1:10, 10:12), 1)], 'c');
+ylim([0, 2]);
+title('V1')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'aprData_OTSpred_V1.eps'));
+
+figure; hold on;
+bar([mean(predictionsAprNew1_4(11:20, 1:3), 1), zeros(1, 9)], 'b');
+bar([zeros(1,3), mean(predictionsAprNew1_4(11:20, 4:6), 1), zeros(1,6)], 'g');
+bar([zeros(1,6), mean(predictionsAprNew1_4(11:20, 7:9), 1), zeros(1,3)], 'r');
+bar([zeros(1,9), mean(predictionsAprNew1_4(11:20, 10:12), 1)], 'c');
+ylim([0, 2]);
+title('V2')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'aprData_OTSpred_V2.eps'));
+
+figure; hold on;
+bar([mean(predictionsAprNew1_4(21:30, 1:3), 1), zeros(1, 9)], 'b');
+bar([zeros(1,3), mean(predictionsAprNew1_4(21:30, 4:6), 1), zeros(1,6)], 'g');
+bar([zeros(1,6), mean(predictionsAprNew1_4(21:30, 7:9), 1), zeros(1,3)], 'r');
+bar([zeros(1,9), mean(predictionsAprNew1_4(21:30, 10:12), 1)], 'c');
+ylim([0, 2]);
+title('V3')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'aprData_OTSpred_V3.eps'));
+
+figure; hold on;
+bar([nanmean(predictionsAprNew1_4(:, 1:3), 1), zeros(1, 9)], 'b');
+bar([zeros(1,3), nanmean(predictionsAprNew1_4(:, 4:6), 1), zeros(1,6)], 'g');
+bar([zeros(1,6), nanmean(predictionsAprNew1_4(:, 7:9), 1), zeros(1,3)], 'r');
+bar([zeros(1,9), nanmean(predictionsAprNew1_4(:, 10:12), 1)], 'c');
+ylim([0, 2]);
+title('V1+V2+V3')
+hgexport(gcf,fullfile(figDir, 'aprData_OTSpred_V123.eps'));
+
+%% Plot the predictions - OLD model
+figure; hold on;
+bar([nanmean(predictionsAprOld1_4(1:10, 1:3), 1), zeros(1, 9)], 'b');
+bar([zeros(1,3), nanmean(predictionsAprOld1_4(1:10, 4:6), 1), zeros(1,6)], 'g');
+bar([zeros(1,6), nanmean(predictionsAprOld1_4(1:10, 7:9), 1), zeros(1,3)], 'r');
+bar([zeros(1,9), nanmean(predictionsAprOld1_4(1:10, 10:12), 1)], 'c');
+ylim([0, 2]);
+title('V1')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'aprData_SOCpred_V1.eps'));
+
+figure; hold on;
+bar([mean(predictionsAprOld1_4(11:20, 1:3), 1), zeros(1, 9)], 'b');
+bar([zeros(1,3), mean(predictionsAprOld1_4(11:20, 4:6), 1), zeros(1,6)], 'g');
+bar([zeros(1,6), mean(predictionsAprOld1_4(11:20, 7:9), 1), zeros(1,3)], 'r');
+bar([zeros(1,9), mean(predictionsAprOld1_4(11:20, 10:12), 1)], 'c');
+ylim([0, 2]);
+title('V2')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'aprData_SOCpred_V2.eps'));
+
+figure; hold on;
+bar([mean(predictionsAprOld1_4(21:30, 1:3), 1), zeros(1, 9)], 'b');
+bar([zeros(1,3), mean(predictionsAprOld1_4(21:30, 4:6), 1), zeros(1,6)], 'g');
+bar([zeros(1,6), mean(predictionsAprOld1_4(21:30, 7:9), 1), zeros(1,3)], 'r');
+bar([zeros(1,9), mean(predictionsAprOld1_4(21:30, 10:12), 1)], 'c');
+ylim([0, 2]);
+title('V3')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'aprData_SOCpred_V3.eps'));
+
+figure; hold on;
+bar([nanmean(predictionsAprOld1_4(:, 1:3), 1), zeros(1, 9)], 'b');
+bar([zeros(1,3), nanmean(predictionsAprOld1_4(:, 4:6), 1), zeros(1,6)], 'g');
+bar([zeros(1,6), nanmean(predictionsAprOld1_4(:, 7:9), 1), zeros(1,3)], 'r');
+bar([zeros(1,9), nanmean(predictionsAprOld1_4(:, 10:12), 1)], 'c');
+ylim([0, 2]);
+title('V1+V2+V3')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'aprData_SOCpred_V123.eps'));
+
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Actual images
@@ -220,25 +683,79 @@ for ii = 69:78
     pause(0.5);
 end
 
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Overall R2s
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Subject 3
+datasetNum = 3;
+voxNums = [v1VoxNums1_3, v2VoxNums1_3, v3VoxNums1_3];
+r2old = zeros(1, length(voxNums));
+r2new = zeros(1, length(voxNums));
+for voxIdx = 1:length(voxNums)
+    voxNum = voxNums(voxIdx);
+    folder = ['subj', num2str(datasetNum), '-vox', num2str(voxNum)];
+
+    filename = ['aegridsearch-a', num2str(aOld), '-e', num2str(eOld), '-subj', num2str(datasetNum), '.mat'];
+    load(fullfile(dataloc, folder, filename), 'results');    
+    r2old(voxIdx) = results.accumR2;
+    
+    filename = ['aegridsearch-a', num2str(aNew), '-e', num2str(eNew), '-subj', num2str(datasetNum), '.mat'];
+    load(fullfile(dataloc, folder, filename), 'results');    
+    r2new(voxIdx) = results.accumR2;
+end
+
+%%
+figure; hold on;
+unityline = linspace(0, 1, 100);
+plot(unityline, unityline, 'k-');
+plot(r2old(r2old > r2new), r2new(r2old > r2new), 'r.');
+plot(r2old(r2old <= r2new), r2new(r2old <= r2new), 'g.');
+xlabel('Original'); ylabel('New');
+title('V1, V2, V3 model fit improvement, dataset3');
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'r2scatter_subj3_V123_origin.eps'));
+
+%% Subject 4
+datasetNum = 4;
+voxNums = [v1VoxNums1_4, v2VoxNums1_4, v3VoxNums1_4];
+voxNums(voxNums == 100) = []; % known missing
+r2old = zeros(1, length(voxNums));
+r2new = zeros(1, length(voxNums));
+for voxIdx = 1:length(voxNums)
+    voxNum = voxNums(voxIdx);
+    folder = ['subj', num2str(datasetNum), '-vox', num2str(voxNum)];
+
+    filename = ['aegridsearch-a', num2str(aOld), '-e', num2str(eOld), '-subj', num2str(datasetNum), '.mat'];
+    load(fullfile(dataloc, folder, filename), 'results');    
+    r2old(voxIdx) = results.accumR2;
+    
+    filename = ['aegridsearch-a', num2str(aNew), '-e', num2str(eNew), '-subj', num2str(datasetNum), '.mat'];
+    load(fullfile(dataloc, folder, filename), 'results');    
+    r2new(voxIdx) = results.accumR2;
+end
+
+%%
+figure; hold on;
+unityline = linspace(0, 1, 100);
+plot(unityline, unityline, 'k-');
+plot(r2old(r2old > r2new), r2new(r2old > r2new), 'rx');
+plot(r2old(r2old <= r2new), r2new(r2old <= r2new), 'gx');
+xlabel('Original'); ylabel('New');
+title('V1, V2, V3 model fit improvement, dataset4');
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'r2scatter_subj4_V123.eps'));
+
+
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Category R2s
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% Choose one canonical A and E
-aOld = 0;
-eOld = 1;
-
-aNew = 0.5;
-eNew = 8;
-
-% avals = [0.25, 0.5, 0.75, 1];
-% evals = [1, 2, 4, 8, 16]; 
-% 
-% for aNew = avals
-%     for eNew = evals
-
-[categoryR2sOld, categoryPredictionsOld] = processGridSearchCategory(aOld, eOld, 3, voxNums3_1);
-[categoryR2sNew, categoryPredictionsNew] = processGridSearchCategory(aNew, eNew, 3, voxNums3_1);
+%% DATASET 3
+[categoryR2sOld, categoryPredictionsOld] = processGridSearchCategory(aOld, eOld, 3, [v1VoxNums1_3, v2VoxNums1_3, v3VoxNums1_3]);
+[categoryR2sNew, categoryPredictionsNew] = processGridSearchCategory(aNew, eNew, 3, [v1VoxNums1_3, v2VoxNums1_3, v3VoxNums1_3]);
 
 catMeansOld = mean(categoryPredictionsOld, 2);
 catMeansNew = mean(categoryPredictionsNew, 2);
@@ -294,14 +811,77 @@ plot(unityline, unityline, 'k-');
 plot(categoryR2sOld(categoryR2sOld > categoryR2sNew), categoryR2sNew(categoryR2sOld > categoryR2sNew), 'ro');
 plot(categoryR2sOld(categoryR2sOld <= categoryR2sNew), categoryR2sNew(categoryR2sOld <= categoryR2sNew), 'go');
 xlabel('Original'); ylabel('New');
-title(['Category-specific R^2 ', num2str(aNew), ' ', num2str(eNew)]);
-
-%     end
-% end
-
+title(['Category-specific R^2 in subject 3', num2str(aNew), ' ', num2str(eNew)]);
 
 %% Predictions difference
-avgDiff = mean(categoryPredictionsNew - categoryPredictionsOld, 2);
+avgDiff = nanmean(categoryPredictionsNew - categoryPredictionsOld, 2);
+figure; hold on;
+bar([avgDiff(1:5); zeros(5,1)], 'r');
+bar([zeros(5,1); avgDiff(6:10)], 'b');
+
+
+%% DATASET 4    
+[categoryR2sOld, categoryPredictionsOld] = processGridSearchCategory(aOld, eOld, 4, [v1VoxNums1_4, v2VoxNums1_4, v3VoxNums1_4]);
+[categoryR2sNew, categoryPredictionsNew] = processGridSearchCategory(aNew, eNew, 4, [v1VoxNums1_4, v2VoxNums1_4, v3VoxNums1_4]);
+
+catMeansOld = nanmean(categoryPredictionsOld, 2);
+catMeansNew = nanmean(categoryPredictionsNew, 2);
+
+figure; hold on;
+plot([catMeansOld(1:5); zeros(5,1)], 'ro-');
+plot([zeros(5,1); catMeansOld(6:10)], 'bo-');
+
+plot([catMeansNew(1:5); zeros(5,1)], 'mo-');
+plot([zeros(5,1); catMeansNew(6:10)], 'co-');
+title('Old vs. new avg');
+
+% V1
+catMeansOldV1 = nanmean(categoryPredictionsOld(:, 1:10), 2);
+catMeansNewV1 = nanmean(categoryPredictionsNew(:, 1:10), 2);
+
+figure; hold on;
+plot([catMeansOldV1(1:5); zeros(5,1)], 'ro-');
+plot([zeros(5,1); catMeansOldV1(6:10)], 'bo-');
+
+plot([catMeansNewV1(1:5); zeros(5,1)], 'mo-');
+plot([zeros(5,1); catMeansNewV1(6:10)], 'co-');
+title('Old vs. new avg, V1 only');
+
+% V2
+catMeansOldV2 = mean(categoryPredictionsOld(:, 11:20), 2);
+catMeansNewV2 = mean(categoryPredictionsNew(:, 11:20), 2);
+
+figure; hold on;
+plot([catMeansOldV2(1:5); zeros(5,1)], 'ro-');
+plot([zeros(5,1); catMeansOldV2(6:10)], 'bo-');
+
+plot([catMeansNewV2(1:5); zeros(5,1)], 'mo-');
+plot([zeros(5,1); catMeansNewV2(6:10)], 'co-');
+title('Old vs. new avg, V2 only');
+
+% V3
+catMeansOldV3 = mean(categoryPredictionsOld(:, 21:30), 2);
+catMeansNewV3 = mean(categoryPredictionsNew(:, 21:30), 2);
+
+figure; hold on;
+plot([catMeansOldV1(1:5); zeros(5,1)], 'ro-');
+plot([zeros(5,1); catMeansOldV1(6:10)], 'bo-');
+
+plot([catMeansNewV3(1:5); zeros(5,1)], 'mo-');
+plot([zeros(5,1); catMeansNewV3(6:10)], 'co-');
+title('Old vs. new avg, V3 only');
+
+%%
+figure; hold on;
+unityline = linspace(0, 1, 100);
+plot(unityline, unityline, 'k-');
+plot(categoryR2sOld(categoryR2sOld > categoryR2sNew), categoryR2sNew(categoryR2sOld > categoryR2sNew), 'ro');
+plot(categoryR2sOld(categoryR2sOld <= categoryR2sNew), categoryR2sNew(categoryR2sOld <= categoryR2sNew), 'go');
+xlabel('Original'); ylabel('New');
+title(['Category-specific R^2 in subject 4', num2str(aNew), ' ', num2str(eNew)]);
+
+%% Predictions difference
+avgDiff = nanmean(categoryPredictionsNew - categoryPredictionsOld, 2);
 figure; hold on;
 bar([avgDiff(1:5); zeros(5,1)], 'r');
 bar([zeros(5,1); avgDiff(6:10)], 'b');
@@ -362,7 +942,7 @@ addXlabels(imNumsToUse, stimuliNames);
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% In-category means, two models
+% In-category means, two models - OUTDATED
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 dataloc = fullfile(rootpath, 'data', 'modelfits', '2015-05-05');
 datasetNum = 3;
@@ -445,15 +1025,3 @@ plot(nanmean(oldPredictions, 1), 'ro');
 plot(nanmean(newPredictions, 1), 'go');
 addXlabels(imNumsDataset(idxTrain), stimuliNames);
 
-%% Recover ancient history
-findVoxel = 31;
-ancient = load('/Local/Users/olsson/Dropbox/Research/code/SOC-new/data/modelfits/2014-06-24/results_V1_all_R=1_S=0pt5.mat');
-voxIdx = find(ancient.voxelFitIxs == findVoxel);
-ancientParams = ancient.results.params(:, :, voxIdx);
-modelfun = get_socmodel_original(90);
-
-
-folder = ['vox', num2str(findVoxel)];
-filename = ['aegridsearch-a', num2str(aOld), '-e', num2str(eOld), '.mat'];
-load(fullfile(dataloc, folder, filename));
-oldPredictions = results.concatPredictions;

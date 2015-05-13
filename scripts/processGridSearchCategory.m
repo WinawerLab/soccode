@@ -5,42 +5,25 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function categoryR2s = processGridSearchCategory(a, e)
+function [categoryR2s, categoryPredictions] = processGridSearchCategory(a, e, datasetNum, voxNums)
 
 %% R^2 on *only* the classes in question?
 
 %% Prepare the data
-dataloc = fullfile(rootpath, 'data', 'modelfits', '2015-05-05');
-datasetNum = 3;
+dataloc = fullfile(rootpath, 'data', 'modelfits', '2015-05-08');
 
-voxNums = [31,42,59,71,72,77,81,83,89,90,10,19,22,29,30,33,35,36,38,47,1,3,7,8,9,12,15,16,18,20];
-           %94,104,115,116,122,125,131,142,143,148,57,60,62,65,68,69,73,76,78,79,24,25,26,28,32,34,37,40,41,43];
-
-imNumsDataset = 70:225;
-
-load(fullfile(rootpath, 'code/visualization/stimuliNames.mat'), 'stimuliNames')
-catTrain = {'pattern_space', 'pattern_central', 'grating_ori', ...
-           'grating_contrast', 'plaid_contrast', 'circular_contrast', ...
-           'pattern_contrast', 'grating_sparse', 'pattern_sparse'}; % omit naturalistic and noise space/halves
-idxTrain = find(arrayfun(@(idx) strInCellArray(stimuliNames{idx}, catTrain), imNumsDataset));
-
-imNumsCat = [176, 177, 178,  179, 180, 181, 182, 183, 85, 184];
-idxCat = convertIndex(imNumsDataset, imNumsCat);
-
-dataset = ['dataset', num2str(datasetNum, '%02d'), '.mat'];
-load(fullfile(rootpath, ['data/input/fmri_datasets/', dataset]),'betamn','betase', 'roi', 'roilabels');
-betamnTrain = betamn(voxNums, idxTrain);
-betamnCat = betamn(voxNums, idxCat);
-
+imNumsCat = [176, 177, 178, 179, 180, 181, 182, 183, 85, 184];
 
 %%
 categoryR2s = ones(1, length(voxNums));
 categoryR2s = categoryR2s * NaN;
 
+categoryPredictions = ones(length(imNumsCat), length(voxNums));
+categoryPredictions = categoryPredictions * NaN;
+
 for voxIdx = 1:length(voxNums)
     voxNum = voxNums(voxIdx);
-    folder = ['vox', num2str(voxNum)];
-    
+    folder = ['subj', num2str(datasetNum), '-vox', num2str(voxNum)];
 
     filename = ['aegridsearch-a', num2str(a), '-e', num2str(e), '-subj', num2str(datasetNum), '.mat'];
     try
@@ -51,13 +34,13 @@ for voxIdx = 1:length(voxNums)
         continue;
     end
 
-    subIdxCat = convertIndex(idxTrain, idxCat);
+    idxCat = convertIndex(results.imNumsToUse, imNumsCat);
     
-    predCat = results.concatPredictions(subIdxCat);
-    useThisMean = mean(betamnTrain(voxIdx, :));
-    categoryR2s(voxIdx) = computeR2(predCat, betamnCat(voxIdx, :), useThisMean);
+    predCat = results.concatPredictions(idxCat);
+    categoryPredictions(:, voxIdx) = predCat;
+    
+    useThisMean = mean(results.betamnToUse);
+    categoryR2s(voxIdx) = computeR2(predCat, results.betamnToUse(:, idxCat), useThisMean);
 end
-
-save('categoryR2s.mat', 'categoryR2s');
 end
 

@@ -142,16 +142,16 @@ legend('V1', 'hV4', 'contrast im means', 'contrast im variances');
 f=figure; hold all;
 
 colorset = jet();
-colorAssignments = cell(size(catMeans.gratingAvg));
+colorAssignments = cell(size(catMeans.gratingPeak));
 
-for ii = 1:length(catMeans.rvals)
-    colorIdx = floor((size(colorset,1)-1) * (ii/length(catMeans.rvals))) + 1;
-    colorAssignments(ii, :, :, :, :) = {colorset(colorIdx, :)};
-end
-% for ii = 1:length(catMeans.svals)
-%     colorIdx = floor((size(colorset,1)-1) * (ii/length(catMeans.svals))) + 1;
-%     colorAssignments(:, ii, :, :, :) = {colorset(colorIdx, :)};
+% for ii = 1:length(catMeans.rvals)
+%     colorIdx = floor((size(colorset,1)-1) * (ii/length(catMeans.rvals))) + 1;
+%     colorAssignments(ii, :, :, :, :) = {colorset(colorIdx, :)};
 % end
+for ii = 1:length(catMeans.svals)
+    colorIdx = floor((size(colorset,1)-1) * (ii/length(catMeans.svals))) + 1;
+    colorAssignments(:, ii, :, :, :) = {colorset(colorIdx, :)};
+end
 % for ii = 1:length(catMeans.avals)
 %     colorIdx = floor((size(colorset,1)-1) * (ii/length(catMeans.avals))) + 1;
 %     colorAssignments(:, :, ii, :, :) = {colorset(colorIdx, :)};
@@ -162,7 +162,7 @@ end
 % end
 
 % Show all:
-scatter(catMeans.gratingAvg(:), catMeans.patternAvg(:), [], cell2mat(colorAssignments(:)));
+scatter(catMeans.gratingPeak(:), catMeans.patternPeak(:), [], cell2mat(colorAssignments(:)));
 
 % Show just a subset:
 % gr = catMeans.gratingAvg(:, :, catMeans.avals==0, catMeans.evals==1);
@@ -172,8 +172,8 @@ scatter(catMeans.gratingAvg(:), catMeans.patternAvg(:), [], cell2mat(colorAssign
 
 ezplot('x', 'r');
 axis([0, 5, 0, 5]); axis('square');
-xlabel('Grating average'); ylabel('Pattern average')
-title('Grating vs. pattern, average comparison');
+xlabel('Grating peak'); ylabel('Pattern peak')
+title('Grating vs. pattern, peak comparison');
 legend('contrast im means');
 
 dcm_obj = datacursormode(f);
