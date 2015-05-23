@@ -113,13 +113,39 @@ exV1idx = 7; % aka 353
 
 setupBetaFig;
 bar(betamnToUse_3(v1VoxNums1_3(exV1idx), :));
-addXlabels(imNumsToUse, stimuliNames);
+%addXlabels(imNumsToUse, stimuliNames);
+errorbar(1:108, betamnToUse_3(v1VoxNums1_3(exV1idx), :), betaseToUse_3(v1VoxNums1_3(exV1idx), :), '.');
 
 % TODO: no, should be leaveoneout!!
-load(fullfile(rootpath, 'data', 'modelfits', '2015-05-12', 'subj3-vox353', 'xval-a0-e1-subj3-nfolds10.mat'), 'results');
-plot(results.concatPredictions(1:108), 'g.-');
+% load(fullfile(rootpath, 'data', 'modelfits', '2015-05-12', 'subj3-vox353', 'xval-a0-e1-subj3-nfolds10.mat'), 'results');
 
+load(fullfile(rootpath, 'data', 'modelfits', '2015-05-13', 'subj3-vox353', 'xval-a0-e1-subj3-nfolds108.mat'), 'results');
+resultsOld = results;
+plot(resultsOld.concatPredictions(1:108), 'r.-');
+disp(computeR2(resultsOld.concatPredictions, betamnToUse_3(v1VoxNums1_3(exV1idx), :)));
+
+load(fullfile(rootpath, 'data', 'modelfits', '2015-05-13', 'subj3-vox353', 'xval-a0.75-e8-subj3-nfolds108.mat'), 'results');
+resultsNew = results;
+plot(resultsNew.concatPredictions(1:108), 'g.-');
+disp(computeR2(resultsNew.concatPredictions, betamnToUse_3(v1VoxNums1_3(exV1idx), :)));
+
+drawPublishAxis;
 hgexport(gcf,fullfile(figDir, ['bars_exampleV1vox_data.eps']));
+
+%% Zoom in to the classes in question
+figure; hold on;
+bar(betamnToUse_3(v1VoxNums1_3(exV1idx), convertIndex(imNumsToUse, imNumsCat)));
+errorbar(1:length(imNumsCat), betamnToUse_3(v1VoxNums1_3(exV1idx), convertIndex(imNumsToUse, imNumsCat)), ...
+    betaseToUse_3(v1VoxNums1_3(exV1idx), convertIndex(imNumsToUse, imNumsCat)), '.');
+
+plot(1:5, resultsOld.concatPredictions(convertIndex(imNumsToUse, imNumsCat(1:5))), 'r.-');
+plot(6:10, resultsOld.concatPredictions(convertIndex(imNumsToUse, imNumsCat(6:10))), 'r.-');
+
+plot(1:5, resultsNew.concatPredictions(convertIndex(imNumsToUse, imNumsCat(1:5))), 'g.-');
+plot(6:10, resultsNew.concatPredictions(convertIndex(imNumsToUse, imNumsCat(6:10))), 'g.-');
+
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, ['bars_exampleV1vox_categories.eps']));
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -253,6 +279,7 @@ title('ECoG data, all channels')
 drawPublishAxis;
 hgexport(gcf,fullfile(figDir, 'redblue_data_ecog_allchannels.eps'));
 
+
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Red bars, blue bars - predictions!
@@ -359,6 +386,8 @@ title('Dataset 3, V1+V2+V3 voxel NEW predictions')
 drawPublishAxis;
 hgexport(gcf,fullfile(figDir, 'redblue_OTSpred_subj3_V123.eps'));
 
+
+
 %% DATASET 4!
 
 datasetNum = 4;
@@ -454,6 +483,76 @@ ylim([-0.5, 2]);
 title('Dataset 4, V1+V2+V3 voxel NEW predictions')
 drawPublishAxis;
 hgexport(gcf,fullfile(figDir, 'redblue_OTSpred_subj4_V123.eps'));
+
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Red bars, blue bars - both data AND predictions!!!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% DATASET 3
+% V1
+voxels = betamnToUse_3(v1VoxNums1_3, convertIndex(imNumsToUse, imNumsCat));
+preds = predictionsOld1_3(1:10, convertIndex(imNumsToUse, imNumsCat));
+semvox = sqrt(var(voxels, 1)) ./ sqrt(size(voxels, 2));
+sempreds = sqrt(var(preds, 1)) ./ sqrt(size(preds, 2));
+
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+errorbar(1:10, mean(voxels, 1), semvox, 'c.');
+
+plot(1:5, mean(preds(:,1:5), 1), 'g.-');
+plot(6:10, mean(preds(:,6:10), 1), 'g.-');
+%errorbar(1:5, mean(preds(:,1:5), 1), sempreds(1:5), 'g.-')
+%errorbar(6:10, mean(preds(:,6:10), 1), sempreds(6:10), 'g.-')
+
+ylim([-0.5, 2]);
+title('Dataset 3, V1 voxel data')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_dataPlusSOC_subj3_V1.eps'));
+
+% V2
+voxels = betamnToUse_3(v2VoxNums1_3, convertIndex(imNumsToUse, imNumsCat));
+preds = predictionsOld1_3(11:20, convertIndex(imNumsToUse, imNumsCat));
+semvox = sqrt(var(voxels, 1)) ./ sqrt(size(voxels, 2));
+sempreds = sqrt(var(preds, 1)) ./ sqrt(size(preds, 2));
+
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+errorbar(1:10, mean(voxels, 1), semvox, 'c.');
+
+plot(1:5, mean(preds(:,1:5), 1), 'g.-');
+plot(6:10, mean(preds(:,6:10), 1), 'g.-');
+%errorbar(1:5, mean(preds(:,1:5), 1), sempreds(1:5), 'g.-')
+%errorbar(6:10, mean(preds(:,6:10), 1), sempreds(6:10), 'g.-')
+
+ylim([-0.5, 2]);
+title('Dataset 3, V2 voxel data')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_dataPlusSOC_subj3_V2.eps'));
+
+% V3
+voxels = betamnToUse_3(v3VoxNums1_3, convertIndex(imNumsToUse, imNumsCat));
+preds = predictionsOld1_3(21:30, convertIndex(imNumsToUse, imNumsCat));
+semvox = sqrt(var(voxels, 1)) ./ sqrt(size(voxels, 2));
+sempreds = sqrt(var(preds, 1)) ./ sqrt(size(preds, 2));
+
+figure; hold on;
+bar([mean(voxels(:, 1:5), 1), zeros(1, 5)], 'r');
+bar([zeros(1,5), mean(voxels(:, 6:10), 1)], 'b');
+errorbar(1:10, mean(voxels, 1), semvox, 'c.');
+
+plot(1:5, mean(preds(:,1:5), 1), 'g.-');
+plot(6:10, mean(preds(:,6:10), 1), 'g.-');
+%errorbar(1:5, mean(preds(:,1:5), 1), sempreds(1:5), 'g.-')
+%errorbar(6:10, mean(preds(:,6:10), 1), sempreds(6:10), 'g.-')
+
+ylim([-0.5, 2]);
+title('Dataset 3, V3 voxel data')
+drawPublishAxis;
+hgexport(gcf,fullfile(figDir, 'redblue_dataPlusSOC_subj3_V3.eps'));
+
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -598,10 +697,10 @@ drawPublishAxis;
 hgexport(gcf,fullfile(figDir, 'aprData_OTSpred_V1.eps'));
 
 figure; hold on;
-bar([mean(predictionsAprNew1_4(11:20, 1:3), 1), zeros(1, 9)], 'b');
-bar([zeros(1,3), mean(predictionsAprNew1_4(11:20, 4:6), 1), zeros(1,6)], 'g');
-bar([zeros(1,6), mean(predictionsAprNew1_4(11:20, 7:9), 1), zeros(1,3)], 'r');
-bar([zeros(1,9), mean(predictionsAprNew1_4(11:20, 10:12), 1)], 'c');
+plot(1:3, mean(predictionsAprNew1_4(11:20, 1:3), 1), 'b.-');
+plot(4:6, mean(predictionsAprNew1_4(11:20, 4:6), 1), 'g.-');
+plot(7:9, mean(predictionsAprNew1_4(11:20, 7:9), 1), 'r.-');
+plot(10:12, mean(predictionsAprNew1_4(11:20, 10:12), 1), 'c.-');
 ylim([0, 2]);
 title('V2')
 drawPublishAxis;
