@@ -20,7 +20,7 @@ function [output, edge, thresh, res] = createPatternStimulus(sz, relCutoff, bpfi
 
     % Filter the image
     mdft = mask.*dft;
-    res = ifft2(ifftshift(mdft));
+    res = ifft2(ifftshift(mdft)); 
 
     % Threshold
     thresh = res - min(res(:)) > (max(res(:)) - min(res(:)))/2;
