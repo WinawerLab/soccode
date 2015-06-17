@@ -1,45 +1,37 @@
-function [output, edge, thresh, res] = createPatternStimulus(sz, relCutoff, bpfilter)
+function [output, edge, thresh, result] = createPatternStimulus(sz, relCutoff, bpfilter)
 % CREATE PATTERN STIMULUS
 %   sz - the desired image size
 %   relCutoff - Define a relative cutoff in terms of the available frequencies
 %   bpfilter - the convolutional bandpass filter to use, in space domain
 
+    if ~exist('toplot', 'var'), toplot = false; end
+
     % Create a random seed
     im = randn(sz(1), sz(2));
     im = im./(max(im(:) - min(im(:)))) + 0.5;
     
-    % Do the DFT
-    dft = fftshift(fft2(im));
-
     % Find the midpoint pixels
     mid = ceil((size(im)+1)/2);
 
-    % Nice soft round filter:
+    % Create a soft round filter in Fourier space
     radius = relCutoff*size(im,1)/2;
     mask = mkDisc(size(im), radius, mid, radius/5);
 
     % Filter the image
+    dft = fftshift(fft2(im));
     mdft = mask.*dft;
-    res = ifft2(ifftshift(mdft)); 
+    result = ifft2(ifftshift(mdft)); 
 
-    % Threshold
-    thresh = res - min(res(:)) > (max(res(:)) - min(res(:)))/2;
+    % Threshold the filtered noise
+    thresh = result - min(result(:)) > (max(result(:)) - min(result(:)))/2;
 
     % Grab edges with derivative filter
-    % (the padding enables us to do circular convolution)
-    threshPad = padarray(thresh, [1, 1], 'circular', 'both');
     edge1 = [0, 0, 0; 1, 0, -1; 0, 0, 0];
     edge2 = [0, 1, 0; 0, 0, 0; 0, -1, 0];
-    edge = conv2(double(threshPad), edge1, 'valid').^2 + conv2(double(threshPad), edge2, 'valid').^2;
+    edge = imfilter(double(thresh), edge1, 'circular').^2 + imfilter(double(thresh), edge2, 'circular').^2;
     %figure; imshow(edge, []);
 
-    % Filter convolutionally with bpfilter; it's too small to be intended in
-    % the Fourier domain
+    % Filter convolutionally with bpfilter in the image domain
     edgePad = padarray(edge, floor(size(bpfilter)/2), 'circular', 'both');
     output = conv2(edgePad, -1*bpfilter, 'valid');
-
-    % Visualize the images (or comment this out to not do so)
-%     tinybp = placematrix(zeros(size(edge)), bpfilter, mid - size(bpfilter)/2);
-%     toShow = {im, ifft2(ifftshift(mask)), res, double(thresh), edge, bpfilter, tinybp, output};
-%     showFourier(toShow);
 end
