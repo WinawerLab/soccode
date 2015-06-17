@@ -24,14 +24,15 @@ mask = makecircleimage(res,res/2*maskFrac,[],[],res/2);  % white (1) circle on b
 
 %% Bars
 jumpvals = [1, 3, 5];
-[bars, contrastBoostBars] = createBarStimulus(res, flt, spacing, jumpvals, nframes);
+[bars, contrastBoostBars, lines] = createBarStimulus(res, flt, spacing, jumpvals, nframes);
 
 %% Patterns
-patvals = [1/50, 1/30, 1/20, 1/10]; % sparsest first (lowest frequency)
+patvals = [1/80, 1/50, 1/30, 1/20, 1/10]; % sparsest first (lowest frequency)
 pats = zeros(res, res, length(patvals), nframes);
 for ii = 1:length(patvals)
-    for jj = 1:length(nframes)
-        pats(:, :, ii, jj) = createPatternStimulus([res, res], patvals(ii), flt);
+    for jj = 1:nframes
+        [output, edge] = createPatternStimulus([res, res], patvals(ii), flt);
+        pats(:, :, ii, jj) = output;
     end
     
     if ii == 1
@@ -40,6 +41,7 @@ for ii = 1:length(patvals)
         % way for both
     end
 end
-pats = pats * contrastBoostPats;
-pats(pats > 0.5) = 0.5;
-pats(pats < -0.5) = -0.5;
+%pats = pats * contrastBoostPats;
+%pats = pats * contrastBoostBars;
+%pats(pats > 0.5) = 0.5;
+%pats(pats < -0.5) = -0.5;

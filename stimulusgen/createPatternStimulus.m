@@ -28,10 +28,13 @@ function [output, edge, thresh, result] = createPatternStimulus(sz, relCutoff, b
     % Grab edges with derivative filter
     edge1 = [0, 0, 0; 1, 0, -1; 0, 0, 0];
     edge2 = [0, 1, 0; 0, 0, 0; 0, -1, 0];
-    edge = imfilter(double(thresh), edge1, 'circular').^2 + imfilter(double(thresh), edge2, 'circular').^2;
+    edge = -1*(imfilter(double(thresh), edge1, 'circular').^2 + imfilter(double(thresh), edge2, 'circular').^2);
+    
+    %     edge(edge < 2) = 0;
+    edge = .125*edge;
     %figure; imshow(edge, []);
 
     % Filter convolutionally with bpfilter in the image domain
     edgePad = padarray(edge, floor(size(bpfilter)/2), 'circular', 'both');
-    output = conv2(edgePad, -1*bpfilter, 'valid');
+    output = conv2(edgePad, bpfilter, 'valid');
 end

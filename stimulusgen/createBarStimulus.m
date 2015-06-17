@@ -1,4 +1,4 @@
-function [output, contrastBoost] = createBarStimulus(sz, bpfilter, spacing, jumpvals, nframes)
+function [output, contrastBoost, lines] = createBarStimulus(sz, bpfilter, spacing, jumpvals, nframes)
 % CREATE BAR STIMULUS
 %   sz - the desired image size
 %   bpfilter - the convolutional bandpass filter to use, in space domain
@@ -16,20 +16,19 @@ function [output, contrastBoost] = createBarStimulus(sz, bpfilter, spacing, jump
     
     for ii = 1:length(jumpvals)
         jump = jumpvals(ii);
-        im = zeros(sz, sz, nframes);
+        lines = zeros(sz, sz, nframes);
         barstarts = round(linspacecircular(1, 1+spacing*jump, nframes));
 
         for frame = 1:length(barstarts)
           barlocs = barstarts(frame):(spacing*jump):sz;
-          im(round(barlocs), :, frame) = -0.5;  % black bars
+          lines(round(barlocs), :, frame) = -0.5;  % black bars
         end
         
 %        display(['Total black pixels: ', num2str(sum(
 
-        im = imfilter(im, bpfilter, 'circular');
+        output(:, :, ii, :) = imfilter(lines, bpfilter, 'circular');
 
-        contrastBoost = .5 / max(abs(flatten(im(round(sz/4):round(3*sz/4), :)))); % separately for each
-        
-        output(:, :, ii, :) = contrastBoost * im;
+        contrastBoost = .5 / max(abs(flatten(lines(round(sz/4):round(3*sz/4), :)))); % separately for each        
+        %output(:, :, ii, :) = contrastBoost * output(:, :, ii, :);
     end
 end

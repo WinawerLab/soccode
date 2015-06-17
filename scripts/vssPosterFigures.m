@@ -2,6 +2,9 @@
 %%%%%%% VSS Analysis, all in one place! Easy to run, easy to find! %%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%% Dependencies
+% knkutils - https://github.com/kendrickkay/knkutils
+
 saveFigures = false;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Loading the data!
