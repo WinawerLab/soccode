@@ -22,13 +22,13 @@ function [output, contrastBoost, lines] = createBarStimulus(sz, bpfilter, spacin
         for frame = 1:length(barstarts)
           barlocs = barstarts(frame):(spacing*jump):sz;
           lines(round(barlocs), :, frame) = -0.5;  % black bars
-        end
-        
-%        display(['Total black pixels: ', num2str(sum(
+        end    
 
-        output(:, :, ii, :) = imfilter(lines, bpfilter, 'circular');
+        filtered = imfilter(lines, bpfilter); % nothing specified -> zero-padded boundaries
 
-        contrastBoost = .5 / max(abs(flatten(lines(round(sz/4):round(3*sz/4), :)))); % separately for each        
-        %output(:, :, ii, :) = contrastBoost * output(:, :, ii, :);
+        contrastBoost = .5 / max(abs(flatten(filtered(round(sz/4):round(3*sz/4), :)))); % separately for each
+            % I expect 0.8526 for the dense ones
+            % and 1.3232 for the sparser ones
+        output(:, :, ii, :) = contrastBoost * filtered;
     end
 end
