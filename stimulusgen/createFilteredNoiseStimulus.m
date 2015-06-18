@@ -1,5 +1,5 @@
 function noise = createFilteredNoiseStimulus(sz, bpfilter, targetVar, nframes)
-% CREATE FILTERED NOISE STIMULUS
+% CREATE FILTERED NOISE STIMULUS - bandpass-filtered white noise
 %   sz - the desired image size
 %   bpfilter - the convolutional bandpass filter to use, in space domain
 %   targetVar - the desired pixel variance of the pixels that are not

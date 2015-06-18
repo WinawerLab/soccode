@@ -1,5 +1,5 @@
 function [output, lines, contrastBoost] = createBarStimulus(sz, bpfilter, spacing, jumpvals, nframes)
-% CREATE BAR STIMULUS
+% CREATE BAR STIMULUS - sparse gratings
 %   sz - the desired image size
 %   bpfilter - the convolutional bandpass filter to use, in space domain
 %   jumpvals - which stripe interleavings to use. Must start with 1.
