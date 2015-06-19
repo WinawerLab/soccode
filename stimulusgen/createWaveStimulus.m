@@ -1,10 +1,10 @@
-function [waves, wavesThresh] = createWaveStimulus(edgeStimuli, angle, bpfilter, cpim, contrastCutoff, smoothness, targetVar)
+function [wavesThresh, wavesUnthresh] = createWaveStimulus(edgeStimuli, angle, bpfilter, cpim, contrastCutoff, smoothness, targetVar)
 % CREATE WAVE STIMULUS - Filter pattern stimuli to have one orientation,
 % and thresholded to only contain high contrast activations
 %
 %   edgeStimuli - a stack of edge stimuli, e.g. the second return value of
 %        createPatternStimulus
-%   angle - 0 for horizontal
+%   angle - from 0 to 2pi
 %   bpfilter - the bandpass filter used in constructing the pattern
 %   contrastCutoff - minimum pixel value to define the neighborhood to retain
 %       in the thresholding step
@@ -38,9 +38,9 @@ wavesThresh = waves .* highcontrast;
 wavesVar = var(wavesThresh(wavesThresh ~= 0));
 contrastBoostWaves = sqrt(targetVar / wavesVar);
 
-waves = waves * contrastBoostWaves;
-waves(waves > 0.5) = 0.5;
-waves(waves < -0.5) = -0.5;
+wavesUnthresh = waves * contrastBoostWaves;
+wavesUnthresh(wavesUnthresh > 0.5) = 0.5;
+wavesUnthresh(wavesUnthresh < -0.5) = -0.5;
 
 wavesThresh = wavesThresh * contrastBoostWaves;
 wavesThresh(wavesThresh > 0.5) = 0.5;
