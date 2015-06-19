@@ -1,4 +1,4 @@
-function noiseBars = createNoiseBarStimulus(noiseStimuli, lineStimuli, blursize, compareVar)
+function [noiseBars, aperture] = createNoiseBarStimulus(noiseStimuli, lineStimuli, blursize, compareVar)
 % CREATE NOISE BAR STIMULUS
 % Stimulus using sparse gratings apertures onto filtered noise
 %
