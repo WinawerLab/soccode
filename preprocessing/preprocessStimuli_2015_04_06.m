@@ -4,7 +4,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Load the images
-imFile = fullfile('data', 'input', 'stimuli_2015_04_06.mat');
+imFile = fullfile('data', 'stimuli', 'stimuli_2015_04_06.mat');
 load(fullfile(rootpath, imFile), 'stimuli');
 
 imStack = stimuli.imStack;

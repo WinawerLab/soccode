@@ -33,7 +33,7 @@ modelfun = get_socmodel_original(90);
 %% Fitting
 inputdir = 'data/preprocessing/2014-12-04';
 
-outputdir = ['data/modelfits/', datestr(now,'yyyy-mm-dd'));
+outputdir = ['data/modelfits/', datestr(now,'yyyy-mm-dd')];
 if ~exist(fullfile(rootpath, outputdir), 'dir')
     mkdir(fullfile(rootpath, outputdir));
 end

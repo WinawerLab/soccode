@@ -17,7 +17,7 @@ function [imNumsToUse, betamnToUse, voxNums] = loadDataset(n, whichVoxs)
     dataset = ['dataset', num2str(n, '%02d'), '.mat'];
     load(fullfile(rootpath, ['data/input/fmri_datasets/', dataset]),'betamn','betase','roi','roilabels');
     
-    if isinteger(whichVoxs)
+    if all(mod(whichVoxs, 1) == 0) % all are integers
         voxNums = whichVoxs;
     elseif ischar(whichVoxs)
         roiNum = find(strcmp(roilabels, whichVoxs));

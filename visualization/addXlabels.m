@@ -1,5 +1,5 @@
 function xlabels = addXlabels(imNums, stimuliNames, rotate)
-%GEN X LABELS - Generate X-axis labels based on stimuli names and indices
+%ADD X LABELS - Generate X-axis labels based on stimuli names and indices
 %
 %   Adds labels to the x axis, based on the names of the categories as
 %   stored in stimuliNames.mat. For example, categories 70:131 are curvy
