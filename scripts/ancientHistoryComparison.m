@@ -39,7 +39,7 @@ bar(results.betamnToUse);
 plot(ancientPredictions, 'co-');
 plot(oldPredictions, 'ro-');
 load(fullfile(rootpath, 'code/visualization/stimuliNames.mat'), 'stimuliNames')
-addXlabels(results.imNumsToUse, stimuliNames);
+addXlabels(stimuliNames(results.imNumsToUse));
 legend('Betas', 'Ancient Fit', 'Modern Fit, a=0')
 
 %% View params
@@ -83,7 +83,7 @@ bar(betamn(findVoxel, fullDatasetIdx));
 plot(redoFullPredictions, 'co-');
 plot(redoPartPredictions, 'mo-');
 load(fullfile(rootpath, 'code/visualization/stimuliNames.mat'), 'stimuliNames')
-addXlabels(preprocess.imNums, stimuliNames);
+addXlabels(stimuliNames(preprocess.imNums));
 legend('Betas', 'Predictions on full dataset', 'Predictions on partial dataset')
 
 %% Visualize all the old, wrongly-indexed, cross-validated *parameters*, but evaluated on the right images
@@ -100,7 +100,7 @@ for ii = 1:length(results.folds)
     setupBetaFig;
     bar(betamn(findVoxel, results.datasetIdxToUse));
     plot(redoPredictions, 'go-');
-    addXlabels(preprocess.imNums, stimuliNames);
+    addXlabels(stimuliNames(preprocess.imNums));
     legend('Betas', ['Predictions on fold ', num2str(ii)])
 end
     
@@ -144,6 +144,6 @@ plot(redoPartOrigPredictions, 'co-');
 plot(redoPartAEPredictions, 'mo-');
 
 load(fullfile(rootpath, 'code/visualization/stimuliNames.mat'), 'stimuliNames')
-addXlabels(preprocess.imNums, stimuliNames);
+addXlabels(stimuliNames(preprocess.imNums));
 legend('Betas', 'Predictions on full dataset, ORIG', 'Predictions on full dataset, NEW', ...
    'Predictions on partial dataset, ORIG', 'Predictions on partial dataset, NEW');

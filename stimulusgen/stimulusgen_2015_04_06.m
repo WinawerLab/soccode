@@ -13,8 +13,11 @@ existingIms = loadImages(imFile, [gratingNums, patternNums]);
 existingIms = (double(existingIms) / 255) - 0.5;
 
 % Define numbers for bookkeeping:
-horizPatternNums = 260:264;
-noiseStripeNums = 265:269;
+%horizPatternNums = 260:264;
+%noiseStripeNums = 265:269;
+% EDIT 09/2015: increment numbers
+horizPatternNums = 261:265;
+noiseStripeNums = 266:270;
 
 %% Put all in a single stack
 sz = size(existingIms);

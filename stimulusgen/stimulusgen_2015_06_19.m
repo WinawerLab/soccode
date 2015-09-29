@@ -225,7 +225,9 @@ tmp2 = tmp(:, :, newOrder, :);
 
 stimuli.imStack = tmp2;
 
-stimuli.imNums = 270:(270+size(stimuli.imStack, 3)-1); % the April stimuli went up through 269
+%stimuli.imNums = 270:(270+size(stimuli.imStack, 3)-1); % the April stimuli went up through 269
+% 09/2015 fix: renumbering to start from 271
+stimuli.imNums = 271:(271+size(stimuli.imStack, 3)-1); % the April stimuli went up through 270 actually
 
 save(fullfile(rootpath, imFile), 'stimuli');
 

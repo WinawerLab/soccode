@@ -1,5 +1,5 @@
-function xlabels = addXlabels(imNums, stimuliNames, rotate)
-%ADD X LABELS - Generate X-axis labels based on stimuli names and indices
+function xlabels = addXlabels(xlabels, rotate)
+%ADD X LABELS - Generate X-axis labels
 %
 %   Adds labels to the x axis, based on the names of the categories as
 %   stored in stimuliNames.mat. For example, categories 70:131 are curvy
@@ -12,10 +12,8 @@ function xlabels = addXlabels(imNums, stimuliNames, rotate)
 %
 %   This function does not create a plot, but modifies an existing plot.
 %
-%       imNums - An array of category indices
-%       stimuliNames - A cell array of stimulus names for each imNum
-    
-    xlabels = stimuliNames(imNums); % take only the ones currently in use
+%       xlabels - A cell array of labels
+%       rotate - (optional) if 1, rotate labels 90 degrees, else don't
     
     if ~exist('rotate', 'var')
         rotate = true;

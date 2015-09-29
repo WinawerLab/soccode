@@ -34,8 +34,7 @@ for a = avals
     allIms = cat(3, gratingIms, patternIms);
 
     %% Create a mask, to prepare to grab the mean and variance within this region
-    %mask = makeCircleMask(37.5, 90);
-    %TODO WRONG THIS MASK IS TOO BIG
+    mask = makeCircleMask(34, 90);
 
     %% Plot images
     figure;

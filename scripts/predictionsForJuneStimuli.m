@@ -42,50 +42,55 @@ modelfun = get_socmodel_original(90);
 
 datasetNum = 4;
 
-%voxNums = [167,44,100,308,172,17,171,84,101,16,...
-%            77,71,92,86,58,67,78,179,469,40]; % Twenty V1 voxels
+fitRois = {'V1', 'V2'};
 
-voxNums = [94,200,619,190,105,204,191,309,274,746, ...
+voxNums = {};
+voxNums{1} = [167,44,100,308,172,17,171,84,101,16,...
+            77,71,92,86,58,67,78,179,469,40]; % Twenty V1 voxels
+
+voxNums{2} = [94,200,619,190,105,204,191,309,274,746, ...
     90,243,472,152,322,473,566,254,457,314]; % Twenty V2 voxels
-        
-predictionsOld = NaN*ones(length(voxNums), size(imToUse, 1));
-predictionsNew = NaN*ones(length(voxNums), size(imToUse, 1));
 
-for voxIdx = 1:length(voxNums)
-    voxNum = voxNums(voxIdx);
-    folder = ['subj', num2str(datasetNum), '-vox', num2str(voxNum)];
-    
-    % Old
-    try
-        filename = ['aegridsearch-a', num2str(aOld), '-e', num2str(eOld), '-subj', num2str(datasetNum), '.mat'];
-        load(fullfile(dataloc, folder, filename), 'results');
-    catch
-        disp('oops, one of the files was not found')
-        continue;
+for roi = 1:length(fitRois)
+    predictionsOld{roi} = NaN*ones(length(voxNums{roi}), size(imToUse, 1));
+    predictionsNew{roi} = NaN*ones(length(voxNums{roi}), size(imToUse, 1));
+
+    for voxIdx = 1:length(voxNums{roi})
+        voxNum = voxNums{roi}(voxIdx);
+        folder = ['subj', num2str(datasetNum), '-vox', num2str(voxNum)];
+
+        % Old
+        try
+            filename = ['aegridsearch-a', num2str(aOld), '-e', num2str(eOld), '-subj', num2str(datasetNum), '.mat'];
+            load(fullfile(dataloc, folder, filename), 'results');
+        catch
+            disp('oops, one of the files was not found')
+            continue;
+        end
+
+        predictions = zeros(length(results.foldImNums), size(imToUse, 1));
+        for fold = 1:length(results.foldImNums)
+            params = results.foldResults(fold).params;
+            predictions(fold, :) = predictResponses(imToUse, params, modelfun);
+        end
+        predictionsOld{roi}(voxIdx, :) = mean(predictions, 1);
+
+        % New
+        try
+            filename = ['aegridsearch-a', num2str(aNew), '-e', num2str(eNew), '-subj', num2str(datasetNum), '.mat'];
+            load(fullfile(dataloc, folder, filename), 'results');
+        catch
+            disp('oops, one of the files was not found')
+            continue;
+        end
+
+        predictions = zeros(length(results.foldImNums), size(imToUse, 1));
+        for fold = 1:length(results.foldImNums)
+            params = results.foldResults(fold).params;
+            predictions(fold, :) = predictResponses(imToUse, params, modelfun);
+        end
+        predictionsNew{roi}(voxIdx, :) = mean(predictions, 1);
     end
-    
-    predictions = zeros(length(results.foldImNums), size(imToUse, 1));
-    for fold = 1:length(results.foldImNums)
-        params = results.foldResults(fold).params;
-        predictions(fold, :) = predictResponses(imToUse, params, modelfun);
-    end
-    predictionsOld(voxIdx, :) = mean(predictions, 1);
-    
-    % New
-    try
-        filename = ['aegridsearch-a', num2str(aNew), '-e', num2str(eNew), '-subj', num2str(datasetNum), '.mat'];
-        load(fullfile(dataloc, folder, filename), 'results');
-    catch
-        disp('oops, one of the files was not found')
-        continue;
-    end
-    
-    predictions = zeros(length(results.foldImNums), size(imToUse, 1));
-    for fold = 1:length(results.foldImNums)
-        params = results.foldResults(fold).params;
-        predictions(fold, :) = predictResponses(imToUse, params, modelfun);
-    end
-    predictionsNew(voxIdx, :) = mean(predictions, 1);
 end
 
 %% Info for plotting / arranging
@@ -93,11 +98,11 @@ end
 patterns_sparse = 1:5;
 gratings_sparse = 6:10;
 noisebars_sparse = 11:15;
-waves_sparse = 16:21;
+waves_sparse = 17:21; % 16 is just toooo sparse
 gratings_ori = [8, 22:24];
 noisebars_ori = [13, 25:27];
-waves_ori = [18, 28:30];
-gratings_cross = [31, 32, 8, 33, 34, 10];
+waves_ori = [20, 28:30];
+gratings_cross = [31, 32, 10, 33, 34, 8];
 gratings_contrast = [35:36, 8, 37:38];
 noisebars_contrast = [39:40, 13, 41:42];
 waves_contrast = [43:44, 18, 45:46];
@@ -124,92 +129,163 @@ plotNames = [repmat({'patterns_sparse'}, length(patterns_sparse), 1); ...
  repmat({'noisebars_contrast'}, length(noisebars_contrast), 1); ...
  repmat({'waves_contrast'}, length(waves_contrast), 1)];
 
+gratingsColor = [80, 130, 220] ./ 255; % blue
+noisebarsColor = [120, 98, 86] ./ 255; % brown
+wavesColor = [0, 115, 130] ./ 255; % green
+patternsColor = [80, 40, 140] ./ 255; % purple
+
+% not in plot order; needs to be reordered:
+catColors = [repmat(patternsColor, length(patterns_sparse), 1); ...
+ repmat(gratingsColor, length(gratings_sparse), 1); ...
+ repmat(noisebarsColor, length(noisebars_sparse), 1); ...
+ repmat(wavesColor, length(waves_sparse)+1, 1); ...
+ ...
+ repmat(gratingsColor, length(gratings_ori)-1, 1); ... % these -1 are to remove repeated categories
+ repmat(noisebarsColor, length(noisebars_ori)-1, 1); ...
+ repmat(wavesColor, length(waves_ori)-1, 1); ...
+ ...
+ repmat(gratingsColor, length(gratings_cross)-2, 1); ...
+ ...
+ repmat(gratingsColor, length(gratings_contrast)-1, 1); ...
+ repmat(noisebarsColor, length(noisebars_contrast)-1, 1); ...
+ repmat(wavesColor, length(waves_contrast)-1, 1); ...
+ repmat(patternsColor, length(patterns_contrast)-1, 1)];
+
 %% Plot! (check titles, names)
 
-figure; hold on;
-bar(nanmean(predictionsOld(:, plotOrder), 1));
-ylim([0, 2]);
-title('V2, SOC')
-if exist('plotNames', 'var'); addXlabels(1:length(plotNames), plotNames); end;
-if saveFigures,
-    %drawPublishAxis; % I don't remember how I got this to work with
-    %addXlabels
-    hgexport(gcf,fullfile(figDir, 'junData_SOCpred_V2.eps'));
-end
+for roi = 1:length(fitRois)
+    figure; hold on;
+    bar(nanmean(predictionsOld{roi}(:, plotOrder), 1));
+    ylim([0, 2]);
+    title([fitRois{roi}, ', SOC'])
+    if exist('plotNames', 'var'); addXlabels(plotNames); end;
+    if saveFigures,
+        %drawPublishAxis; % I don't remember how I got this to work with
+        %addXlabels
+        hgexport(gcf,fullfile(figDir, ['junData_SOCpred_', fitRois{roi}, '.eps']));
+    end
 
-figure; hold on;
-bar(nanmean(predictionsNew(:, plotOrder), 1));
-ylim([0, 2]);
-title('V2, OTS')
-if exist('plotNames', 'var'); addXlabels(1:length(plotNames), plotNames); end;
-if saveFigures,
-    %drawPublishAxis;
-    hgexport(gcf,fullfile(figDir, 'junData_OTSpred_V2.eps'));
+    figure; hold on;
+    bar(nanmean(predictionsNew{roi}(:, plotOrder), 1));
+    ylim([0, 2]);
+    title([fitRois{roi}, ', OTS'])
+    if exist('plotNames', 'var'); addXlabels(plotNames); end;
+    if saveFigures,
+        %drawPublishAxis;
+        hgexport(gcf,fullfile(figDir, ['junData_OTSpred_', fitRois{roi}, '.eps']));
+    end
 end
 
 %% Same thing, but line plot
-figure; hold all;
-plot(nanmean(predictionsOld(:, plotOrder), 1), 'o-');
-plot(nanmean(predictionsNew(:, plotOrder), 1), 'o-');
-ylim([0, 2]);
-title('V2')
-legend('SOC', 'OTS');
-if exist('plotNames', 'var'); addXlabels(1:length(plotNames), plotNames); end;
-if saveFigures,
-    %drawPublishAxis; % I don't remember how I got this to work with
-    %addXlabels
-    hgexport(gcf,fullfile(figDir, 'junData_pred_V2_line.eps'));
+for roi = 1:length(fitRois)
+    figure; hold all;
+    plot(nanmean(predictionsOld{roi}(:, plotOrder), 1), 'o-');
+    plot(nanmean(predictionsNew{roi}(:, plotOrder), 1), 'o-');
+    ylim([0, 2]);
+    title(fitRois{roi})
+    legend('SOC', 'OTS');
+    if exist('plotNames', 'var'); addXlabels(plotNames); end;
+    if saveFigures,
+        %drawPublishAxis; % I don't remember how I got this to work with
+        %addXlabels
+        hgexport(gcf,fullfile(figDir, ['junData_pred_', fitRois{roi}, '_line.eps']));
+    end
 end
 
 %% Load actual data!!
 load('/Volumes/server/Projects/SOC/data/fMRI_CBI/wl_subj022_2015_06_19/GLMdenoised/betas.mat', 'betamn', 'betase', 'glmr2', 'roiNames');
 
-%% Visualize GLM denoised data as function of stimulus and ROI
-for roi = 1:length(roiNames)
-    roiName = roiNames{roi};
+%% Plot predictions on top of data!
+
+for fitRoi = 1:length(fitRois)
+    roiName = fitRois{fitRoi};
+    roi = strInCellArray(roiName, roiNames);
+    data = betamn{roi}(plotOrder);
+    datase = betase{roi}(plotOrder);
+    predOld = nanmean(predictionsOld{fitRoi}(:, plotOrder), 1);
+    predNew = nanmean(predictionsNew{fitRoi}(:, plotOrder), 1);
+
+    scaleMe = mean(data(noisebars_sparse)) / mean(predOld(noisebars_sparse));
+        % this is TOTALLY eyeballing; trying to match the noisebars category,
+        % since it looks like we can do it very well
+
     fH = figure; clf, set(fH, 'Color', 'w'); hold on;
-    bar(betamn{roi}(plotOrder));
-    errorbar(betamn{roi}(plotOrder), betase{roi}(plotOrder), '.k', 'LineWidth', 1)
+
+    %bar(data); % the below will set different colors also:
+    for ii = 1:numel(data)
+      h = bar(ii, data(ii));
+      if ii == 1, hold on, end
+      set(h, 'FaceColor', catColors(plotOrder(ii), :)) 
+    end
+
+    errorbar(data, datase, '.k', 'LineWidth', 1);
+    %plot(predOld * scaleMe, 'ro-');
+    plot(predNew * scaleMe, 'gx-', 'LineWidth', 2);
+
     title(roiName)
     %    set(gca, 'YLim', [0 2], 'XTick', 1.5:3.5:12, 'YTick', 0:.5:2,  ...
     %        'XTickLabel', {'Gratings', 'Noisy Stripes', 'Waves', 'Patterns'})
     ylabel('Mean BOLD response')
-    
-    addXlabels(1:length(plotNames), plotNames);
+
+    addXlabels(plotNames);
 
     setfigurepos([500, 500, 1200, 600]);
-    hgexport(fH, ['Images/betas_all_', roiName, '.eps'])
-    saveas(fH,  ['Images/betas_all_', roiName, '.fig'])
-    saveas(fH,  ['Images/betas_all_', roiName, '.png'])
+    hgexport(fH, fullfile(figDir, ['past_predictions_', roiName, '.eps']))
+    saveas(fH, fullfile(figDir, ['past_predictions_', roiName, '.fig']))
+    saveas(fH, fullfile(figDir, ['past_predictions_', roiName, '.png']))
 end
 
-%% Plot predictions on top of data!
+%% Breakdown plots!! Which ones are worth plotting?
 
-roiName = 'V2';
-roi = strInCellArray(roiName, roiNames);
-data = betamn{roi}(plotOrder);
-datase = betase{roi}(plotOrder);
-predOld = nanmean(predictionsOld(:, plotOrder), 1);
-predNew = nanmean(predictionsNew(:, plotOrder), 1);
+for fitRoi = 1:length(fitRois)
+    roiName = fitRois{fitRoi};
+    roi = strInCellArray(roiName, roiNames);
+    
+    contrastSubset = [gratings_contrast, noisebars_contrast, waves_contrast, patterns_contrast];
+    contrastInterleave = flatten(reshape(1:numel(contrastSubset), 5, [])');
 
-scaleMe = mean(data(noisebars_sparse)) / mean(predOld(noisebars_sparse));
-    % this is TOTALLY eyeballing; trying to match the noisebars category,
-    % since it looks like we can do it very well
+    whichToPlot = {[patterns_sparse, gratings_sparse, noisebars_sparse, waves_sparse],...
+            [gratings_ori, noisebars_ori, waves_ori],...
+            gratings_cross,...
+            contrastSubset,...
+            contrastSubset(contrastInterleave)};
+    titles = {'sparsity', 'orientation', 'cross-modulated', 'contrast', 'contrast(interleaved)'};
 
-fH = figure; clf, set(fH, 'Color', 'w'); hold on;
-bar(data);
-errorbar(data, datase, '.k', 'LineWidth', 1);
-plot(predOld * scaleMe, 'ro-');
-plot(predNew * scaleMe, 'go-')
+    for ii = 1:length(whichToPlot)
+        subset = whichToPlot{ii};
+        fH = figure; clf, set(fH, 'Color', 'w'); hold on;
 
-title(roiName)
-%    set(gca, 'YLim', [0 2], 'XTick', 1.5:3.5:12, 'YTick', 0:.5:2,  ...
-%        'XTickLabel', {'Gratings', 'Noisy Stripes', 'Waves', 'Patterns'})
-ylabel('Mean BOLD response')
+        %b = bar(betamn{roi}(subset));
+        for jj = 1:numel(betamn{roi}(subset))
+          h = bar(jj, betamn{roi}(subset(jj)));
+          if jj == 1, hold on, end
+          set(h, 'FaceColor', catColors(subset(jj), :)) 
+        end
 
-addXlabels(1:length(plotNames), plotNames);
+        errorbar(betamn{roi}(subset), betase{roi}(subset), '.k', 'LineWidth', 1);
+        %plot(nanmean(predictionsOld(:, subset), 1) * scaleMe, 'ro-'); % no! bad!
 
-setfigurepos([500, 500, 1200, 600]);
-hgexport(fH, ['Images/past_predictions_', roiName, '.eps'])
-saveas(fH,  ['Images/past_predictions_', roiName, '.fig'])
-saveas(fH,  ['Images/past_predictions_', roiName, '.png'])
+        if strcmp(titles{ii}, 'contrast(interleaved)')
+            values = nanmean(predictionsNew{fitRoi}(:, subset), 1) * scaleMe;
+            plot(1:4, values(1:4), 'go-', 'LineWidth', 2);
+            plot(5:8, values(5:8), 'go-', 'LineWidth', 2);
+            plot(9:12, values(9:12), 'go-', 'LineWidth', 2);
+            plot(13:16, values(13:16), 'go-', 'LineWidth', 2);
+            plot(17:20, values(17:20), 'go-', 'LineWidth', 2);
+        else
+            plot(nanmean(predictionsNew{fitRoi}(:, subset), 1) * scaleMe, 'go-', 'LineWidth', 2);
+        end
+
+        title([roiName, ' - ', titles{ii}]);
+        %    set(gca, 'YLim', [0 2], 'XTick', 1.5:3.5:12, 'YTick', 0:.5:2,  ...
+        %        'XTickLabel', {'Gratings', 'Noisy Stripes', 'Waves', 'Patterns'})
+        ylabel('Mean BOLD response')
+
+        setfigurepos([500, 500, 1200, 600]);
+
+        hgexport(fH, fullfile(figDir, ['past_predictions_', roiName, titles{ii}, '.eps']))
+        saveas(fH, fullfile(figDir, ['past_predictions_', roiName, titles{ii}, '.fig']))
+        saveas(fH, fullfile(figDir, ['past_predictions_', roiName, titles{ii}, '.png']))
+
+    end
+end

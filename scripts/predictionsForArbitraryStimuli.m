@@ -116,7 +116,7 @@ figure; hold on;
 bar(nanmean(predictionsOld(:, predPlotOrder), 1));
 ylim([0, 2]);
 title('V2, SOC')
-if exist('plotNames', 'var'); addXlabels(1:length(plotNames), plotNames); end;
+if exist('plotNames', 'var'); addXlabels(plotNames); end;
 if saveFigures,
     %drawPublishAxis; % I don't remember how I got this to work with
     %addXlabels
@@ -127,7 +127,7 @@ figure; hold on;
 bar(nanmean(predictionsNew(:, predPlotOrder), 1));
 ylim([0, 2]);
 title('V2, OTS')
-if exist('plotNames', 'var'); addXlabels(1:length(plotNames), plotNames); end;
+if exist('plotNames', 'var'); addXlabels(plotNames); end;
 if saveFigures,
     %drawPublishAxis;
     hgexport(gcf,fullfile(figDir, 'junData_OTSpred_V2.eps'));
@@ -140,7 +140,7 @@ plot(nanmean(predictionsNew(:, predPlotOrder), 1), 'o-');
 ylim([0, 2]);
 title('V2')
 legend('SOC', 'OTS');
-if exist('plotNames', 'var'); addXlabels(1:length(plotNames), plotNames); end;
+if exist('plotNames', 'var'); addXlabels(plotNames); end;
 if saveFigures,
     %drawPublishAxis; % I don't remember how I got this to work with
     %addXlabels

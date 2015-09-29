@@ -21,7 +21,7 @@ voxNum = 33;
 fh = setupBetaFig();
 bar(betamn(voxNum, :));
 load(fullfile(rootpath, 'code/visualization/stimuliNames.mat'), 'stimuliNames')
-addXlabels(imNumsToUse, stimuliNames);
+addXlabels(stimuliNames(imNumsToUse));
 
 %% Extract the relevant voxel and images
 betamnIdx = convertIndex(imNumsDataset, imNumsToUse);
@@ -102,4 +102,4 @@ plot(modelPredictionsAvg,'ro','LineWidth',3);
 ylabel('BOLD signal (% change)');
 title('Data and model fit');
 
-addXlabels(imNumsToUse, stimuliNames);
+addXlabels(stimuliNames(imNumsToUse));

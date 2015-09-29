@@ -628,7 +628,7 @@ setupBetaFig;
 bar(mean(betamnToUse_3(v1VoxNums1_3, :), 1));
 plot(mean(predictionsOld1_3(1:10, :), 1), 'ro');
 plot(mean(predictionsNew1_3(1:10, :), 1), 'go');
-addXlabels(imNumsToUse, stimuliNames, false);
+addXlabels(stimuliNames(imNumsToUse), false);
 title('V1, dataset 3')
 legend('Data', 'Old model', 'New model')
 if saveFigures,
@@ -640,7 +640,7 @@ setupBetaFig;
 bar(mean(betamnToUse_3(v2VoxNums1_3, :), 1));
 plot(mean(predictionsOld1_3(11:20, :), 1), 'ro');
 plot(mean(predictionsNew1_3(11:20, :), 1), 'go');
-addXlabels(imNumsToUse, stimuliNames);
+addXlabels(stimuliNames(imNumsToUse));
 title('V2, dataset 3')
 legend('Data', 'Old model', 'New model')
 if saveFigures,
@@ -652,7 +652,7 @@ setupBetaFig;
 bar(mean(betamnToUse_3(v3VoxNums1_3, :), 1));
 plot(mean(predictionsOld1_3(21:30, :), 1), 'ro');
 plot(mean(predictionsNew1_3(21:30, :), 1), 'go');
-addXlabels(imNumsToUse, stimuliNames);
+addXlabels(stimuliNames(imNumsToUse));
 title('V3, dataset 3')
 legend('Data', 'Old model', 'New model')
 if saveFigures,
@@ -665,7 +665,7 @@ setupBetaFig;
 bar(mean(betamnToUse_4(v1VoxNums1_4, :), 1));
 plot(mean(predictionsOld1_4(1:10, :), 1), 'ro');
 plot(mean(predictionsNew1_4(1:10, :), 1), 'go');
-addXlabels(imNumsToUse, stimuliNames);
+addXlabels(stimuliNames(imNumsToUse));
 title('V1, dataset 4')
 legend('Data', 'Old model', 'New model')
 if saveFigures,
@@ -677,7 +677,7 @@ setupBetaFig;
 bar(mean(betamnToUse_4(v2VoxNums1_4, :), 1));
 plot(mean(predictionsOld1_4(11:20, :), 1), 'ro');
 plot(mean(predictionsNew1_4(11:20, :), 1), 'go');
-addXlabels(imNumsToUse, stimuliNames);
+addXlabels(stimuliNames(imNumsToUse));
 title('V2, dataset 4')
 legend('Data', 'Old model', 'New model')
 if saveFigures,
@@ -689,7 +689,7 @@ setupBetaFig;
 bar(mean(betamnToUse_4(v3VoxNums1_4, :), 1));
 plot(mean(predictionsOld1_4(21:30, :), 1), 'ro');
 plot(mean(predictionsNew1_4(21:30, :), 1), 'go');
-addXlabels(imNumsToUse, stimuliNames);
+addXlabels(stimuliNames(imNumsToUse));
 title('V3, dataset 4')
 legend('Data', 'Old model', 'New model')
 if saveFigures,
@@ -1090,24 +1090,24 @@ newResiduals = processGridSearchResiduals(aNew, eNew, 3, voxNums3_1);
 
 setupBetaFig;
 bar(nanmean(oldResiduals, 2));
-addXlabels(imNumsToUse, stimuliNames);
+addXlabels(stimuliNames(imNumsToUse));
 title('Old residuals, avg')
 
 setupBetaFig;
 bar(nanmean(newResiduals, 2));
-addXlabels(imNumsToUse, stimuliNames);
+addXlabels(stimuliNames(imNumsToUse));
 title('New residuals, avg')
 
 setupBetaFig;
 change = nanmean(newResiduals - oldResiduals, 2);
 bar(change);
-addXlabels(imNumsToUse, stimuliNames);
+addXlabels(stimuliNames(imNumsToUse));
 title('Average of difference between residuals')
 
 betterOrWorse = bsxfun(@times, -1*sign(oldResiduals), (newResiduals - oldResiduals));
 setupBetaFig;
 bar(nanmean(betterOrWorse, 2));
-addXlabels(imNumsToUse, stimuliNames);
+addXlabels(stimuliNames(imNumsToUse));
 title('Better? Or worse?')
 
 %%
@@ -1131,7 +1131,7 @@ setupBetaFig;
 bar(results.betamnToUse);
 plot(oldPredictions, 'ro-');
 plot(newPredictions, 'go-');
-addXlabels(imNumsToUse, stimuliNames);
+addXlabels(stimuliNames(imNumsToUse));
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1209,12 +1209,12 @@ setupBetaFig;
 bar(datasets{1}.vals(voxNum, :));
 % plot(oldPredictions, 'ro');
 % plot(newPredictions, 'go');
-addXlabels(imNumsDataset(idxTrain), stimuliNames);
+addXlabels(stimuliNames(imNumsDataset(idxTrain)));
 
 %%
 setupBetaFig;
 bar(mean(betamnTrain, 1));
 plot(nanmean(oldPredictions, 1), 'ro');
 plot(nanmean(newPredictions, 1), 'go');
-addXlabels(imNumsDataset(idxTrain), stimuliNames);
+addXlabels(stimuliNames(imNumsDataset(idxTrain)));
 
