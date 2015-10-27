@@ -24,12 +24,12 @@ masked = maskNd(gaborStack, mask);
 masked = reshape(permute(masked, [2 1 3 4]), size(masked, 2), []);
 
 means = mean(masked, 2);
-setupBetaFig(); bar(means); addXlabels(stimuliNames(gabor.imNums)); title('Means');
+setupBetaFig(1); bar(means); addXlabels(stimuliNames(gabor.imNums)); title('Means');
 
 vars = var(masked, [], 2);
-setupBetaFig(); bar(vars); addXlabels(stimuliNames(gabor.imNums)); title('Vars');
+setupBetaFig(2); bar(vars); addXlabels(stimuliNames(gabor.imNums)); title('Vars');
 
-setupBetaFig(); bar(vars./means); addXlabels(stimuliNames(gabor.imNums)); title('Vars over Means');
+setupBetaFig(3); bar(vars./means); addXlabels(stimuliNames(gabor.imNums)); title('Vars over Means');
 
 %% Set up params and figure
 % r = 1;
