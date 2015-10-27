@@ -4,18 +4,21 @@ function result = maskNd(mat, mask)
 %
 % Inputs:
 %   mat - a matrix M * N * A * ... * Z
-%   mask - a logical mask M *N
+%   mask - a logical mask M *N (or any number of dimensions)
 % 
 % Outputs:
-%   result - a matrix sum(mask) * A * ... * Z resulting from treating
+%   result - a matrix sum(mask(:)) * A * ... * Z resulting from treating
 %       the mask as a set of logical indices into the first two
 %       dimensions of mat
 
     dims = size(mat);
-    fullmask = repmat(mask, [1, 1, dims(3:end)]);
+    nd = ndims(mask);
+    
+    repmatnd = [ones(1, nd), dims((nd+1):end)];
+    fullmask = repmat(mask, repmatnd);
     
     indices = find(fullmask);
-    reshapeSize = [length(find(mask)), dims(3:end)];
+    reshapeSize = [length(find(mask)), dims((nd+1):end)];
     indices = reshape(indices, reshapeSize);
 
     result = mat(indices);
