@@ -17,8 +17,6 @@ function xlabels = addXlabels(xlabels, rotate)
     
     if ~exist('rotate', 'var')
         rotate = true;
-    else
-        rotate = false;
     end
     
     curr = '';

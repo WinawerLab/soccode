@@ -1,6 +1,9 @@
-%% PREDICTIONS FOR June STIMULI:
+%% PREDICTIONS FOR Oct STIMULI:
 % Make predictions, based on saved model-fit parameters,
-% of ROI responses for 2015-06 stimuli
+% of ROI responses for 2015-10 stimuli
+
+% TODO - as far as I can tell, this file was never really updated from 
+% predictionsForJuneStimuli, so IGNORE THIS FILE.
 
 %% Create figs directory
 figDir = fullfile(rootpath, 'figs', datestr(now,'yyyy-mm-dd'));
@@ -25,7 +28,8 @@ dataloc = fullfile(rootpath, 'data', 'modelfits', '2015-05-08');
 %% Get the new stimuli
 inputDir = fullfile('data', 'preprocessing', '2015-09-13');
 
-inputFile = ['newstimuli_r', strrep(num2str(r), '.', 'pt'),...
+% TODO: check that jun stimuli is right
+inputFile = ['junstimuli_r', strrep(num2str(r), '.', 'pt'),...
     '_s', strrep(num2str(s), '.', 'pt'),...
     '_a', strrep(num2str(aOld), '.', 'pt'),...
     '_e', strrep(num2str(eOld), '.', 'pt'), '.mat'];
@@ -94,71 +98,15 @@ for roi = 1:length(fitRois)
 end
 
 %% Info for plotting / arranging
-% TODO: the following needs to be rephrased in terms of imnums
-patterns_sparse = 1:5;
-gratings_sparse = 6:10;
-noisebars_sparse = 11:15;
-waves_sparse = 17:21; % 16 is just toooo sparse
-gratings_ori = [8, 22:24];
-noisebars_ori = [13, 25:27];
-waves_ori = [20, 28:30];
-gratings_cross = [31, 32, 10, 33, 34, 8];
-gratings_contrast = [35:36, 8, 37:38];
-noisebars_contrast = [39:40, 13, 41:42];
-waves_contrast = [43:44, 18, 45:46];
-patterns_contrast = [47:48, 3, 49:50];
-
-plotOrder = [patterns_sparse, gratings_sparse, noisebars_sparse, waves_sparse, ...
-             gratings_ori, noisebars_ori, waves_ori ...
-             gratings_cross, ...
-             patterns_contrast, gratings_contrast, noisebars_contrast, waves_contrast];
-         
-plotNames = [repmat({'patterns_sparse'}, length(patterns_sparse), 1); ...
- repmat({'gratings_sparse'}, length(gratings_sparse), 1); ...
- repmat({'noisebars_sparse'}, length(noisebars_sparse), 1); ...
- repmat({'waves_sparse'}, length(waves_sparse), 1); ...
- ...
- repmat({'gratings_ori'}, length(gratings_ori), 1); ...
- repmat({'noisebars_ori'}, length(noisebars_ori), 1); ...
- repmat({'waves_ori'}, length(waves_ori), 1); ...
- ...
- repmat({'gratings_cross'}, length(gratings_cross), 1); ...
- ...
- repmat({'patterns_contrast'}, length(patterns_contrast), 1); ...
- repmat({'gratings_contrast'}, length(gratings_contrast), 1); ...
- repmat({'noisebars_contrast'}, length(noisebars_contrast), 1); ...
- repmat({'waves_contrast'}, length(waves_contrast), 1)];
-
-gratingsColor = [80, 130, 220] ./ 255; % blue
-noisebarsColor = [120, 98, 86] ./ 255; % brown
-wavesColor = [0, 115, 130] ./ 255; % green
-patternsColor = [80, 40, 140] ./ 255; % purple
-
-% not in plot order; needs to be reordered:
-catColors = [repmat(patternsColor, length(patterns_sparse), 1); ...
- repmat(gratingsColor, length(gratings_sparse), 1); ...
- repmat(noisebarsColor, length(noisebars_sparse), 1); ...
- repmat(wavesColor, length(waves_sparse)+1, 1); ...
- ...
- repmat(gratingsColor, length(gratings_ori)-1, 1); ... % these -1 are to remove repeated categories
- repmat(noisebarsColor, length(noisebars_ori)-1, 1); ...
- repmat(wavesColor, length(waves_ori)-1, 1); ...
- ...
- repmat(gratingsColor, length(gratings_cross)-2, 1); ...
- ...
- repmat(gratingsColor, length(gratings_contrast)-1, 1); ...
- repmat(noisebarsColor, length(noisebars_contrast)-1, 1); ...
- repmat(wavesColor, length(waves_contrast)-1, 1); ...
- repmat(patternsColor, length(patterns_contrast)-1, 1)];
+[plotOrder, plotNames, catColors] = getOctPlotInfo();
 
 %% Plot! (check titles, names)
 
 for roi = 1:length(fitRois)
     figure; hold on;
-    bar(nanmean(predictionsOld{roi}(:, plotOrder), 1));
+    plotWithColors(nanmean(predictionsOld{roi}, 1), plotOrder, plotNames, catColors);
     ylim([0, 2]);
     title([fitRois{roi}, ', SOC'])
-    if exist('plotNames', 'var'); addXlabels(plotNames); end;
     if saveFigures,
         %drawPublishAxis; % I don't remember how I got this to work with
         %addXlabels
@@ -166,7 +114,7 @@ for roi = 1:length(fitRois)
     end
 
     figure; hold on;
-    bar(nanmean(predictionsNew{roi}(:, plotOrder), 1));
+    plotWithColors(nanmean(predictionsNew{roi}, 1), plotOrder, plotNames, catColors);
     ylim([0, 2]);
     title([fitRois{roi}, ', OTS'])
     if exist('plotNames', 'var'); addXlabels(plotNames); end;
@@ -175,7 +123,6 @@ for roi = 1:length(fitRois)
         hgexport(gcf,fullfile(figDir, ['junData_OTSpred_', fitRois{roi}, '.eps']));
     end
 end
-
 %% Same thing, but line plot
 for roi = 1:length(fitRois)
     figure; hold all;
@@ -205,19 +152,15 @@ for fitRoi = 1:length(fitRois)
     predOld = nanmean(predictionsOld{fitRoi}(:, plotOrder), 1);
     predNew = nanmean(predictionsNew{fitRoi}(:, plotOrder), 1);
 
+    noisebars_sparse = 11:15;
     scaleMe = mean(data(noisebars_sparse)) / mean(predOld(noisebars_sparse));
         % this is TOTALLY eyeballing; trying to match the noisebars category,
         % since it looks like we can do it very well
 
     fH = figure; clf, set(fH, 'Color', 'w'); hold on;
-
-    %bar(data); % the below will set different colors also:
-    for ii = 1:numel(data)
-      h = bar(ii, data(ii));
-      if ii == 1, hold on, end
-      set(h, 'FaceColor', catColors(plotOrder(ii), :)) 
-    end
-
+    plotWithColors(data, plotOrder, plotNames, catColors);
+    plotWithColors(betamn{roi}, plotOrder, plotNames, catColors);
+    
     errorbar(data, datase, '.k', 'LineWidth', 1);
     %plot(predOld * scaleMe, 'ro-');
     plot(predNew * scaleMe, 'gx-', 'LineWidth', 2);
@@ -227,7 +170,6 @@ for fitRoi = 1:length(fitRois)
     %        'XTickLabel', {'Gratings', 'Noisy Stripes', 'Waves', 'Patterns'})
     ylabel('Mean BOLD response')
 
-    addXlabels(plotNames);
 
     setfigurepos([500, 500, 1200, 600]);
     hgexport(fH, fullfile(figDir, ['past_predictions_', roiName, '.eps']))
