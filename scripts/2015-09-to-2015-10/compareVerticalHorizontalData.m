@@ -40,7 +40,7 @@ for ii = 1:length(data)
     end
 end
 
-%% Make all plots!
+%% Make all plots! (Time-consuming and mostly unnecessary!)
 for ii = 1:length(data)
     for roiIdx = 1:length(data(ii).roiNames)
         setupBetaFig;

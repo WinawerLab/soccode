@@ -2,6 +2,9 @@
 % Make predictions, based on saved model-fit parameters,
 % of ROI responses for 2015-06 stimuli
 
+% WARNING - A bug was found in this file which caused the bars to be
+% shuffled twice (i.e. indexed by plotOrder twice.) do NOT trust this file!
+
 %% Create figs directory
 figDir = fullfile(rootpath, 'figs', datestr(now,'yyyy-mm-dd'));
 if ~exist(figDir, 'dir')

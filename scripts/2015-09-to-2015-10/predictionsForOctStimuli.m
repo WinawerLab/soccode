@@ -2,7 +2,7 @@
 % Make predictions, based on saved model-fit parameters,
 % of ROI responses for 2015-10 stimuli
 
-% TODO - as far as I can tell, this file was never really updated from 
+% WARNING - as far as I can tell, this file was never really updated from 
 % predictionsForJuneStimuli, so IGNORE THIS FILE.
 
 %% Create figs directory

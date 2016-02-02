@@ -1,12 +1,12 @@
 function plotWithColors(data, plotOrder, plotNames, catColors)
 % PLOT WITH COLORS - Given data, a reordering, a set of un-reordered names,
-% and a set of un-reordered colors, make a bar plot
+% and a set of *re*ordered colors, make a bar plot
 
     for ii = 1:numel(plotOrder)
       h = bar(ii, data(plotOrder(ii)), 1);
       %h = bar(ii, data(ii), 1);
       if ii == 1, hold on, end
-      set(h, 'FaceColor', catColors(plotOrder(ii), :)) 
+      set(h, 'FaceColor', catColors(ii, :)) 
     end
 
     addXlabels(plotNames,1);
