@@ -10,18 +10,60 @@ end
 
 %% Run example stimuli
 
-for demostim = [8, 9, 10, 29, 30, 31, 32];
+% demostims = [8, 9, 10, 29, 30, 31, 32];
+demostims = [33, 34, 8, 35, 36]; 
+stims = [];
+resps = zeros(size(demostims));
+outfirsts = [];
+outseconds = [];
+
+for ii = 1:length(demostims)
+    demostim = demostims(ii);
     disp(demostim)
     stimulus = double(stimuli.imStack(:,:,demostim,1)); % 8 and 29
-    stimulus = (stimulus-min(stimulus(:)))/(max(stimulus(:))-min(stimulus(:))) - 0.5;
-    resp = catherine_secondordercontrast(stimulus, 1);
+    stimulus = stimulus/255 - 0.5;
+    [resp, outfirst, outsecond] = catherine_secondordercontrast(stimulus, 1);
+    disp(resp)
+    
+    stims = cat(3, stims, stimulus);
+    resps(ii) = resp;
+    outfirsts = cat(5, outfirsts, outfirst);
+    outseconds = cat(5, outseconds, outsecond);
 
     saveas(gcf,fullfile(figDir, ['multiband-vis-', num2str(demostim), '.png']));
     %hgexport(gcf,fullfile(figDir, ['multiband-vis-', num2str(demostim), '.eps']));
 end
 
+%% Make pics for example stimuli, with same scale
+
+respfirsts = sum(sum(outfirsts, 2),1);
+respseconds = sum(sum(outseconds, 2),1);
+
+for ii = 1:length(demostims)
+    figure(ii);
+    
+    stimulus = stims(:,:,ii);
+    outfirst = outfirsts(:,:,:,:,ii);
+    outsecond = outseconds(:,:,:,:,ii);
+    
+    subplot(2,2,1); imshow(stimulus, [min(stims(:)), max(stims(:))]); colormap('gray'); freezeColors; title('Stimulus');
+
+    respfirst = squeeze(sum(sum(outfirst,2),1));
+    subplot(2,2,2); imagesc(respfirst', [0, max(respfirsts(:))]); axis xy; title('Filtered response, summed across space, varying by ori and SF'); colormap('parula'); freezeColors; xlabel('Orientation'); ylabel('SF');
+
+    popresp = squeeze(sum(sum(outfirst,4),3));
+    subplot(2,2,3); imshow(popresp,[0, max(outfirsts(:))]); colormap('gray'); freezeColors; title('Population response, summed across ori and SF');
+
+    respsecond = squeeze(sum(sum(outsecond,2),1));
+    subplot(2,2,4); imagesc(respsecond', [0, max(respseconds(:))]); axis xy; title('SECOND-order response, summed across space, varying by ori and SF'); colormap('parula'); freezeColors; xlabel('Orientation'); ylabel('SF');
+    
+    saveas(gcf,fullfile(figDir, ['multiband-vis-normalized-', num2str(demostims(ii)), '.png']));
+end
+
 %% Get ready to plot these all pretty-like
 [plotOrder, plotNames, catColors] = getJunePlotInfo();
+
+data = load_subj001_2015_10_22();
 
 %% Run all stimuli
 
@@ -32,13 +74,15 @@ for i = 1:nstim
     i
     
     stimulus = double(stimuli.imStack(:,:,i,1));
-    stimulus = (stimulus-min(stimulus(:)))/(max(stimulus(:))-min(stimulus(:))) - 0.5;
+    %stimulus = (stimulus-min(stimulus(:)))/(max(stimulus(:))-min(stimulus(:))) - 0.5;
+    stimulus = stimulus/255 - 0.5;
     
     totalresponseGlobalSOC(i) = catherine_secondordercontrast(stimulus);
     totalresponseGlobalSOC(i)
 end
 
-plotWithColors(totalresponseGlobalSOC, plotOrder, plotNames, catColors);
+plotWithColors(totalresponseGlobalSOC, data.plotOrder, data.plotNames, data.catColors);
+ylim([0, max(totalresponseGlobalSOC(1:30))*1.2]);
 
 %% Run all stimuli more different
 nstim = length(stimuli.stimuliNames);
