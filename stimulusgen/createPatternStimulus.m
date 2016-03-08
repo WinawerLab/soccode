@@ -34,4 +34,5 @@ function [output, edge, thresh, result] = createPatternStimulus(sz, relCutoff, b
 
     % Filter convolutionally with bpfilter in the image domain
     output = imfilter(edge, bpfilter, 'circular');
+
 end

@@ -7,6 +7,7 @@ function noise = createFilteredNoiseStimulus(sz, bpfilter, targetVar, nframes)
 %   nframes - number of images
 
     noise = randn(sz, sz, nframes) - 0.5;
+    noise = noise - mean(noise(:));
     noise = imfilter(noise, bpfilter, 'circular');
 
     % scale it to have the same variance as other categories *in the parts that

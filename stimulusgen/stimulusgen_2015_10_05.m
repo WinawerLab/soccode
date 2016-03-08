@@ -1,5 +1,4 @@
-%% Stimulus generation for the June 2015 stimulus set
-% (formerly known as "monsterRewrite.m")
+%% Stimulus generation for the October 2015 stimulus set
 
 %% Set up image size parameters
 res = 600; %400;                     % native resolution that we construct at
