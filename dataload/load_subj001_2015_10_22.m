@@ -8,7 +8,7 @@ data.title = 'Vertical';
 
 %% Load data
 
-tmp = load(fullfile(rootpath, 'data', 'fMRI_CBI', data.fmri_fname, 'GLMdenoised', 'betas.mat'), 'betamn', 'betase', 'roiNames', 'glmr2');
+tmp = load(fullfile(rootpath, 'data', 'fMRI_CBI', data.fmri_fname, 'GLMdenoised', 'ROIbetas.mat'), 'betamn', 'betase', 'roiNames', 'glmr2');
 data.betamn = tmp.betamn;
 data.betase = tmp.betase;
 data.roiNames = tmp.roiNames;

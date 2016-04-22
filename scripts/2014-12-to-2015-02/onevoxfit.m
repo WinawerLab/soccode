@@ -4,7 +4,7 @@
 
 %% Acquire a dataset
 dataset = 'dataset03.mat';
-load(fullfile(rootpath, ['data/input/fmri_datasets/', dataset]),'betamn','betase');
+load(fullfile(rootpath, ['data/fmri_datasets/', dataset]),'betamn','betase');
 % betamn is 1323 voxels * 156 betamn values
 
 %% Which images are in the dataset?

@@ -1,23 +1,18 @@
 function data = load_subj022_2015_06_19()
+% Combines the fMRI data with stimulus and plotting information, for 
+% ease of use
 
-%% Define datasets
+%% Get current data
+fmri_fname = 'wl_subj022_2015_06_19';
+load(fullfile(rootpath, 'data', 'fMRI_CBI', fmri_fname, 'GLMdenoised', 'roiBetas.mat'));
+data = roiBetas;
+data.fmri_fname = fmri_fname;
 
-data = struct();
-
-data.fmri_fname = 'wl_subj022_2015_06_19';
 data.stimuli_fname = 'stimuli-2015-06-19.mat';
-data.title = 'Horizontal';
-
-%% Load data
-tmp = load(fullfile(rootpath, 'data', 'fMRI_CBI', data.fmri_fname, 'GLMdenoised', 'betas-lessOld.mat'), 'betamn', 'betase', 'roiNames', 'glmr2');
-data.betamn = tmp.betamn;
-data.betase = tmp.betase;
-data.roiNames = tmp.roiNames;
-data.glmr2 = tmp.glmr2;
-clear tmp;
-
 load(fullfile(rootpath,'data', 'stimuli', data.stimuli_fname), 'stimuli');
 data.stimuli = stimuli;
+
+data.title = 'Horizontal';
 
 %% Repeat bars as needed
 % I regret that this is spelled out by hand, but redoing it also completely

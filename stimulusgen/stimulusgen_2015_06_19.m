@@ -8,13 +8,13 @@ cpd = 3;                       % target cycles per degree
 
 maskFrac = 11.5/totalfov;      % what fraction of radius for the circular mask to start at
 
-nframes = 9;                 % how many images from each class
+nframes = 9;                   % how many images from each class
 
 radius = totalfov/2;           % radius of image in degrees
 cpim = totalfov*cpd;           % cycles per image that we are aiming for
 spacing = res/cpim;            % pixels to move from one cycle to the next
 
-span = [-0.5, 0.5];             % dynamic range, to put into 'imshow' etc.
+span = [-0.5, 0.5];            % dynamic range, to put into 'imshow' etc.
 
 %% Choose which bandpass filter to use
 bandwidth = 1;
