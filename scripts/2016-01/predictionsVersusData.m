@@ -26,8 +26,11 @@ dataRoiIdx = strInCellArray(roi, data.roiNames);
 predictionRoiIdx = 2; % V2 is the second element of the cell array
 
 setupBetaFig;
-plotWithColors(data.betamn{dataRoiIdx}, data.plotOrder, data.plotNames, data.catColors)
-errorbar(data.betamn{dataRoiIdx}(data.plotOrder), data.betase{dataRoiIdx}(data.plotOrder), 'k.');
+%plotWithColors(data.betamn{dataRoiIdx}, data.plotOrder, data.plotNames, data.catColors)
+%errorbar(data.betamn{dataRoiIdx}(data.plotOrder), data.betase{dataRoiIdx}(data.plotOrder), 'k.');
+plotWithColors(data.roiBetamn{dataRoiIdx}, data.plotOrder, data.plotNames, data.catColors) % 2016-05 edit
+errorbar(data.roiBetamn{dataRoiIdx}(data.plotOrder), data.roiBetase{dataRoiIdx}(data.plotOrder), 'k.');
+
 title([data.title, ', ', roi])
 
 %% Plot predictions
@@ -35,11 +38,13 @@ predSOC = nanmean(predictionsSOC{predictionRoiIdx}, 1);
 predOTS = nanmean(predictionsOTS{predictionRoiIdx}, 1);
 
 noisebars_sparse = 11:15;
-scaleMe = mean(data.betamn{dataRoiIdx}(noisebars_sparse)) / mean(predSOC(noisebars_sparse));
+%scaleMe = mean(data.betamn{dataRoiIdx}(noisebars_sparse)) / mean(predSOC(noisebars_sparse));
+scaleMe = mean(data.roiBetamn{dataRoiIdx}(noisebars_sparse)) / mean(predSOC(noisebars_sparse));
     % this is TOTALLY eyeballing; trying to match the noisebars category,
     % since it looks like we can do it very well
 plot(predSOC(data.plotOrder) * scaleMe, 'rx-', 'LineWidth', 2);
-scaleMe = mean(data.betamn{dataRoiIdx}(noisebars_sparse)) / mean(predOTS(noisebars_sparse));
+%scaleMe = mean(data.betamn{dataRoiIdx}(noisebars_sparse)) / mean(predOTS(noisebars_sparse));
+scaleMe = mean(data.roiBetamn{dataRoiIdx}(noisebars_sparse)) / mean(predOTS(noisebars_sparse));
     % this is TOTALLY eyeballing; trying to match the noisebars category,
     % since it looks like we can do it very well
 plot(predOTS(data.plotOrder) * scaleMe, 'gx-', 'LineWidth', 2);

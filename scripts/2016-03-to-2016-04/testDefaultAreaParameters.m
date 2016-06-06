@@ -8,10 +8,10 @@ dataStruct = load_subj022_2015_06_19();
 
 %% Set default parameters from Kay et al. 2013b
 paramRoiNames = {'V1', 'V2', 'V3'}; % hV4
-roiPrfSigmaAtTwoDeg = [0.16, 0.18, 0.25, 0.18];
+roiPrfSigmaAtTwoDeg = [0.16, 0.18, 0.25, 0.18]*90;
 roiN = [0.18, 0.13, 0.12, 0.13];
 roiC = [0.93, 0.99, 0.99];
-R = 0.5; S = 1.0;
+R = 1; S = .5;
 X = 45; Y = 45;
 G = 1;
 
@@ -41,6 +41,7 @@ for paramRoiIdx = 1:length(paramRoiNames)
     whichRoi = paramRoiNames{paramRoiIdx};
 
     predMean = roiPredMean{paramRoiIdx};
+    
     data = dataStruct.roiBetamn{strInCellArray(whichRoi, dataStruct.roiNames)};
     G = mean(data)/mean(predMean);
 
@@ -89,4 +90,6 @@ plot(G*predNoC(dataStruct.plotOrder), 'go');
 
 title([whichRoi, ' data, with C parameter (red) and without (green)'])
 saveas(gcf, fullfile(figDir, ['adjustParam_C_', whichRoi, '.png']));
+
+%% Re-create the example plots from the SOC paper
 

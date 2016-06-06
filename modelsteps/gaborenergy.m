@@ -10,10 +10,7 @@ function output = gaborenergy(imFlat, numor, numph, cpfovs)
 %   imFlat - a matrix of (X*Y) * N * numor bands of energy, summed across
 %   phases, with gabor wavelets
 
-    if ~exist('cpfovs', 'var'), 
-         cpfovs = 37.5*(180/150); % WARNING is not sufficiently general!
-    end
-    
+  
     assert(ndims(imFlat) < 3, 'MATLAB:assertion:failed', 'imFlat may not already contain bands');
 
    

@@ -11,7 +11,10 @@ end
 %% Run example stimuli
 
 % demostims = [8, 9, 10, 29, 30, 31, 32];
-demostims = [33, 34, 8, 35, 36]; 
+% demostims = [33, 34, 8, 35, 36]; 
+% demostims = [8, 9, 10, 29, 30, 31, 32, 33, 34, 35, 36];
+demostims = 33; % testing only
+
 stims = [];
 resps = zeros(size(demostims));
 outfirsts = [];
@@ -61,9 +64,12 @@ for ii = 1:length(demostims)
 end
 
 %% Get ready to plot these all pretty-like
-[plotOrder, plotNames, catColors] = getJunePlotInfo();
 
 data = load_subj001_2015_10_22();
+
+plotOrder = data.plotOrder;
+plotNames = data.plotNames;
+catColors = data.catColors;
 
 %% Run all stimuli
 
@@ -72,13 +78,14 @@ nstim = length(stimuli.stimuliNames);
 totalresponseGlobalSOC = zeros(1,nstim);
 for i = 1:nstim
     i
-    
+    tic
     stimulus = double(stimuli.imStack(:,:,i,1));
     %stimulus = (stimulus-min(stimulus(:)))/(max(stimulus(:))-min(stimulus(:))) - 0.5;
     stimulus = stimulus/255 - 0.5;
     
     totalresponseGlobalSOC(i) = catherine_secondordercontrast(stimulus);
     totalresponseGlobalSOC(i)
+    toc
 end
 
 plotWithColors(totalresponseGlobalSOC, data.plotOrder, data.plotNames, data.catColors);
