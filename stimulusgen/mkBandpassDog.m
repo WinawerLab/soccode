@@ -40,6 +40,7 @@ fltGuess = evaldog2d([mid, mid, guess_sd1, guess_sdratio, 1, guess_gain, 0], xx,
 
 % Use minimization to try to do even better
 options = optimset('Display','iter','MaxFunEvals',Inf,'MaxIter',1000,'TolFun',1e-6,'TolX',1e-6);
+options = optimset('Display','iter','MaxFunEvals',Inf,'MaxIter',500,'TolFun',1e-6,'TolX',1e-6);
 
 % TODO what is thisL
 bandexpt = 5;                  % exponent to apply to the amplitude spectrum of target SF band for fitting purposes

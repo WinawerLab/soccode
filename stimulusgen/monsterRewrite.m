@@ -1,28 +1,30 @@
 
 %% Set up image size parameters
-res = 400;                     % native resolution that we construct at
-totalfov = 12;                 % total number of degrees for image
-cpd = 3;                       % target cycles per degree
+screenres = 800;                  % native resolution that we construct at (pixels)
+screenfov = 12;                   % height of screen (deg)
+cpd       = 3;                    % target cycles per degree
 
-maskFrac = 11.5/totalfov;      % what fraction of radius for the circular mask to start at
+maskFrac  = 0.95;                 % what fraction of radius for the circular mask to start at
 
-nframes = 9;                 % how many images from each class
+nframes   = 9;                    % how many images from each class
 
-radius = totalfov/2;           % radius of image in degrees
-cpim = totalfov*cpd;           % cycles per image that we are aiming for
-spacing = res/cpim;            % pixels to move from one cycle to the next
+f         = 1;                  % image is what fraction of screen height?
+stimfov   = round(screenfov * f); % diameter of stimulus in degrees (may be less than screen)
+stimres   = round(screenres * f); % resolution of stimulus in pixels
+cpim      = stimfov*cpd;          % cycles per image that we are aiming for
+spacing   = stimres/cpim;         % pixels to move from one cycle to the next
 
-span = [-0.5, 0.5];             % dynamic range, to put into 'imshow' etc.
+span = [-0.5, 0.5];               % dynamic range, to put into 'imshow' etc.
 
 %% Choose which bandpass filter to use
 bandwidth = 1;
 fltsz = 31;
-flt = mkBandpassCosine(res, cpim, bandwidth, fltsz, 0);
+flt = mkBandpassCosine(screenres, cpim, bandwidth, fltsz, 0);
 %flt = mkBandpassDog(res, cpim, bandwidth, fltsz, 0);
 
 %% Make circular stimulus masks
-innerres = floor(4/totalfov * res/2)*2;
-mask = makecircleimage(res,res/2*maskFrac,[],[],res/2);  % white (1) circle on black (0)
+innerres = floor(4/stimfov * screenres/2)*2;
+mask = makecircleimage(screenres,screenres/2*maskFrac,[],[],screenres/2);  % white (1) circle on black (0)
 
 %% Bars
 canonicalSparsity = 5;
@@ -31,13 +33,13 @@ canonicalAngle = 0;
 jumpvals = [9, 7, 5, 3, 1];
 angles = [0, pi/4, pi/2, 3*pi/4];
 
-[barsSparsity, linesSparsity, ~] = createBarStimulus(res, flt, spacing, jumpvals, nframes, canonicalAngle);
+[barsSparsity, linesSparsity, ~] = createBarStimulus(screenres, flt, spacing, jumpvals, nframes, canonicalAngle);
 
 barsOri = [];
 linesOri = [];
 for angle = angles(1:end)
     if angle == canonicalAngle; continue; end; % don't duplicate work
-    [bar, line, ~] = createBarStimulus(res, flt, spacing, canonicalSparsity, nframes, angle);
+    [bar, line, ~] = createBarStimulus(screenres, flt, spacing, canonicalSparsity, nframes, angle);
     barsOri = cat(3, barsOri, bar);
     linesOri = cat(3, linesOri, line);
 end
@@ -46,11 +48,11 @@ end
 patvals = [0.012, 0.016, 0.022, 0.041, 0.06];
     % first four are carefully matched to 9, 7, 5, and 3... then the last is arbitrary
     % sparsest is first (lowest frequency)
-patterns = zeros(res, res, length(patvals), nframes);
-edges = zeros(res, res, length(patvals), nframes);
+patterns = zeros(screenres, screenres, length(patvals), nframes);
+edges = zeros(screenres, screenres, length(patvals), nframes);
 for ii = 1:length(patvals)
     for jj = 1:nframes
-        [output, edge] = createPatternStimulus([res, res], patvals(ii), flt);
+        [output, edge] = createPatternStimulus([screenres, screenres], patvals(ii), flt);
         patterns(:, :, ii, jj) = output;
         edges(:, :, ii, jj) = edge;
     end
@@ -76,20 +78,20 @@ patterns(patterns < -0.5) = -0.5;
 %% Bandpassed white noise
 compareIms = patterns(:, :, 1:3, :);
 compareVar = var(compareIms(compareIms ~= 0)); % 0.0325
-noise = createFilteredNoiseStimulus(res, flt, compareVar, nframes);
+noise = createFilteredNoiseStimulus(screenres, flt, compareVar, nframes);
 noise = permute(noise, [1 2 4 3]);
 
 %% Noise bars
 blursize = 5; % NOTE: tuned by hand to be correct size!
 extraVarBoost = 1.2; % to compensate for clipping; a hack
 
-noiseBarsSparsity = createFilteredNoiseStimulus(res, flt, compareVar, nframes*(length(jumpvals)));
-noiseBarsSparsity = reshape(noiseBarsSparsity, res, res, length(jumpvals), nframes);
+noiseBarsSparsity = createFilteredNoiseStimulus(screenres, flt, compareVar, nframes*(length(jumpvals)));
+noiseBarsSparsity = reshape(noiseBarsSparsity, screenres, screenres, length(jumpvals), nframes);
 [noiseBarsSparsity, nbsApertures] = createNoiseBarStimulus(noiseBarsSparsity, linesSparsity(:, :, 1:end, :), blursize, compareVar*extraVarBoost);
 
-noiseBarsOri = createFilteredNoiseStimulus(res, flt, compareVar, nframes*(length(angles)-1));
+noiseBarsOri = createFilteredNoiseStimulus(screenres, flt, compareVar, nframes*(length(angles)-1));
     % exclude the canonical orientation
-noiseBarsOri = reshape(noiseBarsOri, res, res, length(angles)-1, nframes);
+noiseBarsOri = reshape(noiseBarsOri, screenres, screenres, length(angles)-1, nframes);
 [noiseBarsOri, nboApertures] = createNoiseBarStimulus(noiseBarsOri, linesOri, blursize, compareVar*extraVarBoost);
 
 % % Check: Variance
@@ -127,9 +129,9 @@ smoothness = 4;
 % Sparsity
 % use one denser edge set for waves
 extraPatval = 0.08;
-extraEdges = zeros(res, res, 1, nframes);
+extraEdges = zeros(screenres, screenres, 1, nframes);
 for jj = 1:nframes
-    [output, edge] = createPatternStimulus([res, res], extraPatval, flt);
+    [output, edge] = createPatternStimulus([screenres, screenres], extraPatval, flt);
     extraEdges(:, :, 1, jj) = edge;
 end
 wavesSparsity = createWaveStimulus(cat(3, edges, extraEdges), canonicalAngle, flt, cpim, contrastCutoff, smoothness, compareVar);
@@ -175,7 +177,7 @@ mediumKnockout = createKnockoutStimulus(mediumBars, knockLines, 8, 0);
 knockouts = cat(3, denseKnockin, denseKnockout, mediumKnockin, mediumKnockout);
 
 %% Blank
-blank = zeros(res, res, 1, nframes);
+blank = zeros(screenres, screenres, 1, nframes);
 
 %% Combine everything
 canonicalContrast = 0.25;
@@ -187,9 +189,10 @@ everything = cat(3, everything, barsContrast, noiseBarsContrast, wavesContrast, 
 everything = bsxfun(@times, mask, everything);
 
 %% Visualize everything
-showme = 30:size(everything, 3);%1:size(everything, 3); % 30:34
-figure; for ii = showme, for jj = 1:9, imshow(everything(:, :, ii, jj), span); waitforbuttonpress; end; end; %pause(0.5); end;
+showme = 1:size(everything, 3);%1:size(everything, 3); % 30:34
+figure; for ii = showme, for jj = 1, imshow(everything(:, :, ii, jj), span); title(ii); waitforbuttonpress; end; end; %pause(0.5); end;
 
+return
 %% Chop up into two matrices
 first = cat(3, everything(:, :, 1:2:end, :), blank);
 first = uint8(round((first+0.5)*255));

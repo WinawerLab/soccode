@@ -128,7 +128,7 @@ predsOldParams{2} = stdObs_predict(allParams{2}(:,1:5), imFlat, cpIm, gaborOutpu
 %% Plot *all* predictions versus data
 
 rois = {'RV1', 'RV2', 'RV3'};
-for area = 1:2%:3 % just V1 for now
+for area = 1:3 % just V1 for now
     roiData = data.betamn{strInCellArray(rois{area}, data.roiNames)};
     
     predStdObs = mean(preds(epa(:,3) == area, :), 1);
